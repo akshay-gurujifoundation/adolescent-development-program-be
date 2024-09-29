@@ -1,11 +1,11 @@
 package in.gurujifoundation.controller;
 
-import in.gurujifoundation.request.CreateOrUpdateSchoolRequest;
+import in.gurujifoundation.request.CreateOrUpdateTeacherRequest;
 import in.gurujifoundation.response.APIResponse;
 import in.gurujifoundation.response.ResponseMessage;
-import in.gurujifoundation.response.SchoolDetails;
-import in.gurujifoundation.response.SchoolsResponse;
-import in.gurujifoundation.service.SchoolService;
+import in.gurujifoundation.response.TeacherDetails;
+import in.gurujifoundation.response.TeacherResponse;
+import in.gurujifoundation.service.TeacherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,24 +22,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/schools")
-@Tag(name = "School")
-public class SchoolController {
+@RequestMapping("/teachers")
+@Tag(name = "Teacher")
+public class TeacherController {
 
-    private final SchoolService schoolService;
+    private final TeacherService teacherService;
 
     @Autowired
-    public SchoolController(SchoolService schoolService) {
-        this.schoolService = schoolService;
+    public TeacherController(TeacherService teacherService) {
+        this.teacherService = teacherService;
     }
 
     @Operation(
-            summary = "Save School",
-            description = "Endpoint to save school",
+            summary = "Save Teacher",
+            description = "Endpoint to save teacher",
             security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "School created successfully",
+            @ApiResponse(responseCode = "201", description = "Teacher created successfully",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
@@ -47,19 +47,19 @@ public class SchoolController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
     @PostMapping
-    public ResponseEntity<?> createSchool(@RequestBody @Valid CreateOrUpdateSchoolRequest createSchoolRequest) {
-        ResponseMessage responseMessage = schoolService.createSchool(createSchoolRequest);
+    public ResponseEntity<?> createTeacher(@RequestBody @Valid CreateOrUpdateTeacherRequest createTeacherRequest) {
+        ResponseMessage responseMessage = teacherService.createTeacher(createTeacherRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
 
     @Operation(
-            summary = "Update School",
-            description = "Endpoint to update school",
+            summary = "Update Teacher",
+            description = "Endpoint to update teacher",
             security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "School updated successfully",
+            @ApiResponse(responseCode = "201", description = "Teacher updated successfully",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
@@ -67,20 +67,20 @@ public class SchoolController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateSchool(@RequestBody @Valid CreateOrUpdateSchoolRequest updateSchoolRequest, @PathVariable Long id) {
-        ResponseMessage responseMessage = schoolService.updateSchool(updateSchoolRequest, id);
+    public ResponseEntity<?> updateTeacher(@RequestBody @Valid CreateOrUpdateTeacherRequest updateTeacherRequest, @PathVariable Long id) {
+        ResponseMessage responseMessage = teacherService.updateTeacher(updateTeacherRequest, id);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
 
     @Operation(
-            summary = "Get School by id",
-            description = "Endpoint to retrieve school details by id",
+            summary = "Get Teacher by ID",
+            description = "Endpoint to retrieve teacher details by id",
             security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "School details retrieved successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = SchoolDetails.class))),
+            @ApiResponse(responseCode = "200", description = "Teacher details retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherDetails.class))),
             @ApiResponse(responseCode = "404", description = "School not found", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
@@ -88,38 +88,38 @@ public class SchoolController {
     })
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getSchoolById(@PathVariable Long id) {
-        SchoolDetails schoolDetails = schoolService.getSchoolById(id);
+    public ResponseEntity<?> getTeacherById(@PathVariable Long id) {
+        TeacherDetails teacherDetails = teacherService.getTeacherById(id);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(APIResponse.builder().status(Boolean.TRUE).data(schoolDetails).build());
+                .body(APIResponse.builder().status(Boolean.TRUE).data(teacherDetails).build());
     }
 
     @Operation(
-            summary = "Get all schools",
-            description = "Endpoint to retrieve all schools",
+            summary = "Get all teachers",
+            description = "Endpoint to retrieve all teachers",
             security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Schools retrieved successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = SchoolsResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Teachers retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TeacherResponse.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
     @GetMapping
-    public ResponseEntity<?> getSchools() {
-        SchoolsResponse schoolsResponse = schoolService.getSchools();
-        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(schoolsResponse).build());
+    public ResponseEntity<?> getAllTeachers() {
+        TeacherResponse teacherResponse = teacherService.getAllTeachers();
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(teacherResponse).build());
     }
 
     @Operation(
-            summary = "Delete school by id",
-            description = "Endpoint to delete school by id",
+            summary = "Delete School by id",
+            description = "Endpoint to delete teacher by id",
             security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "School deleted successfully",
+            @ApiResponse(responseCode = "200", description = "Teacher deleted successfully",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
@@ -128,7 +128,7 @@ public class SchoolController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTeacher(@PathVariable Long id) {
-        ResponseMessage responseMessage = schoolService.deleteSchool(id);
+        ResponseMessage responseMessage = teacherService.deleteTeacher(id);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
 }

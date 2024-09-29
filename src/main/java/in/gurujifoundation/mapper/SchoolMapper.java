@@ -16,7 +16,7 @@ public interface SchoolMapper {
     SchoolMapper INSTANCE = Mappers.getMapper(SchoolMapper.class);
 
     @Mapping(target = "id", ignore = true)
-    School toEntity(CreateOrUpdateSchoolRequest request);
+    School mapToEntity(CreateOrUpdateSchoolRequest request);
 
     @Mapping(target = "id", source = "school.id")
     @Mapping(target = "name", source = "school.name")
@@ -27,9 +27,9 @@ public interface SchoolMapper {
     @Mapping(target = "managingTrustee", source = "school.managingTrustee")
     @Mapping(target = "trusteeContactInfo", source = "school.trusteeContactInfo")
     @Mapping(target = "website", source = "school.website")
-    SchoolDetails toResponse(School school);
+    SchoolDetails mapToSchoolDetails(School school);
 
-    List<SchoolDetails> toSchoolDetails(List<School> schools);
+    List<SchoolDetails> mapToSchoolDetailsList(List<School> schools);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "name", source = "createOrUpdateSchoolRequest.name")
