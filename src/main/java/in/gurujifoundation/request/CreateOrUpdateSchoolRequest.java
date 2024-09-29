@@ -3,7 +3,7 @@ package in.gurujifoundation.request;
 import lombok.Data;
 
 @Data
-public class CreateSchoolRequest {
+public class CreateOrUpdateSchoolRequest {
     private String name;
     private String address;
     private String phoneNumber;

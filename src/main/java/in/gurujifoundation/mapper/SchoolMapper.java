@@ -1,10 +1,11 @@
 package in.gurujifoundation.mapper;
 
 import in.gurujifoundation.domain.School;
-import in.gurujifoundation.request.CreateSchoolRequest;
+import in.gurujifoundation.request.CreateOrUpdateSchoolRequest;
 import in.gurujifoundation.response.SchoolDetails;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public interface SchoolMapper {
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "deletedAt", ignore = true)
-    School toEntity(CreateSchoolRequest request);
+    School toEntity(CreateOrUpdateSchoolRequest request);
 
     @Mapping(target = "id", source = "school.id")
     @Mapping(target = "name", source = "school.name")
@@ -32,4 +33,18 @@ public interface SchoolMapper {
     SchoolDetails toResponse(School school);
 
     List<SchoolDetails> toSchoolDetails(List<School> schools);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
+    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "name", source = "createOrUpdateSchoolRequest.name")
+    @Mapping(target = "address", source = "createOrUpdateSchoolRequest.address")
+    @Mapping(target = "phoneNumber", source = "createOrUpdateSchoolRequest.phoneNumber")
+    @Mapping(target = "principalName", source = "createOrUpdateSchoolRequest.principalName")
+    @Mapping(target = "principalContactNo", source = "createOrUpdateSchoolRequest.principalContactNo")
+    @Mapping(target = "managingTrustee", source = "createOrUpdateSchoolRequest.managingTrustee")
+    @Mapping(target = "trusteeContactInfo", source = "createOrUpdateSchoolRequest.trusteeContactInfo")
+    @Mapping(target = "website", source = "createOrUpdateSchoolRequest.website")
+    void updateSchool(CreateOrUpdateSchoolRequest createOrUpdateSchoolRequest, @MappingTarget School school);
 }

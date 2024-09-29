@@ -6,7 +6,7 @@ import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.SchoolMapper;
 import in.gurujifoundation.repository.SchoolRepository;
-import in.gurujifoundation.request.CreateSchoolRequest;
+import in.gurujifoundation.request.CreateOrUpdateSchoolRequest;
 import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.response.SchoolDetails;
 import in.gurujifoundation.response.SchoolsResponse;
@@ -30,11 +30,11 @@ public class SchoolServiceImpl implements SchoolService {
     }
 
     @Override
-    public ResponseMessage createSchool(CreateSchoolRequest request) {
+    public ResponseMessage createSchool(CreateOrUpdateSchoolRequest request) {
         try {
             School school = SchoolMapper.INSTANCE.toEntity(request);
             schoolRepository.save(school);
-            return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_SAVED).build();
+            return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_CREATED_SUCCESSFULLY).build();
         } catch (Exception e) {
             log.error("Error occurred while saving school with email: {}", request.getName(), e);
             throw new InternalServerException("Unexpected error occurred");
@@ -45,13 +45,7 @@ public class SchoolServiceImpl implements SchoolService {
     @Override
     public SchoolDetails getSchoolById(Long id) {
         try {
-            log.debug("Starting to fetch school details for id: {}", id);
-            Optional<School> schoolOptional = schoolRepository.findById(id);
-            if (schoolOptional.isEmpty()) {
-                log.warn("No School found for id: {}", id);
-                throw new EntityNotFoundException(ErrorCodeConstant.SCHOOL_DOES_NOT_EXIST);
-            }
-            School school = schoolOptional.get();
+            School school = getSchool(id);
             log.debug("Successfully retrieved school details for id: {}", id);
             return SchoolMapper.INSTANCE.toResponse(school);
         } catch (Exception e) {
@@ -62,9 +56,36 @@ public class SchoolServiceImpl implements SchoolService {
 
     @Override
     public SchoolsResponse getSchools() {
-        List<School> schools = schoolRepository.findAll();
-        List<SchoolDetails> schoolDetails = SchoolMapper.INSTANCE.toSchoolDetails(schools);
-        return SchoolsResponse.builder().users(schoolDetails).build();
+        try {
+            List<School> schools = schoolRepository.findAll();
+            List<SchoolDetails> schoolDetails = SchoolMapper.INSTANCE.toSchoolDetails(schools);
+            return SchoolsResponse.builder().users(schoolDetails).build();
+        } catch (Exception e) {
+            log.error("Error occurred while fetching schools from db ", e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
 
+    @Override
+    public ResponseMessage updateSchool(CreateOrUpdateSchoolRequest createOrUpdateSchoolRequest, Long id) {
+        try {
+            School school = getSchool(id);
+            SchoolMapper.INSTANCE.updateSchool(createOrUpdateSchoolRequest, school);
+            schoolRepository.save(school);
+            return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_UPDATED_SUCCESSFULLY).build();
+        } catch (Exception e) {
+            log.error("Error occurred while updating school with email: {}", createOrUpdateSchoolRequest.getName(), e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
+
+    private School getSchool(Long id) {
+        log.debug("Starting to fetch school details for id: {}", id);
+        Optional<School> schoolOptional = schoolRepository.findById(id);
+        if (schoolOptional.isEmpty()) {
+            log.warn("No School found for id: {}", id);
+            throw new EntityNotFoundException(ErrorCodeConstant.SCHOOL_DOES_NOT_EXIST);
+        }
+        return schoolOptional.get();
     }
 }

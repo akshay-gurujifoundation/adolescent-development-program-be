@@ -1,6 +1,6 @@
 package in.gurujifoundation.controller;
 
-import in.gurujifoundation.request.CreateSchoolRequest;
+import in.gurujifoundation.request.CreateOrUpdateSchoolRequest;
 import in.gurujifoundation.response.APIResponse;
 import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.response.SchoolDetails;
@@ -46,8 +46,28 @@ public class SchoolController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
     @PostMapping
-    public ResponseEntity<?> createSchool(@RequestBody @Valid CreateSchoolRequest request) {
+    public ResponseEntity<?> createSchool(@RequestBody @Valid CreateOrUpdateSchoolRequest request) {
         ResponseMessage responseMessage = schoolService.createSchool(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
+    @Operation(
+            summary = "Update School",
+            description = "Endpoint to update school",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "School updated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateSchool(@RequestBody @Valid CreateOrUpdateSchoolRequest createOrUpdateSchoolRequest , @PathVariable Long id) {
+        ResponseMessage responseMessage = schoolService.updateSchool(createOrUpdateSchoolRequest, id);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
