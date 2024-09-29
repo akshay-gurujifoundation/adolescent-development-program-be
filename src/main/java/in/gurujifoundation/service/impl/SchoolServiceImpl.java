@@ -30,13 +30,15 @@ public class SchoolServiceImpl implements SchoolService {
     }
 
     @Override
-    public ResponseMessage createSchool(CreateOrUpdateSchoolRequest request) {
+    public ResponseMessage createSchool(CreateOrUpdateSchoolRequest createSchoolRequest) {
         try {
-            School school = SchoolMapper.INSTANCE.toEntity(request);
+            log.debug("Started creating school with name: {}", createSchoolRequest.getName());
+            School school = SchoolMapper.INSTANCE.mapToEntity(createSchoolRequest);
             schoolRepository.save(school);
+            log.debug("Successfully created school with name: {}", createSchoolRequest.getName());
             return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_CREATED_SUCCESSFULLY).build();
         } catch (Exception e) {
-            log.error("Error occurred while saving school with email: {}", request.getName(), e);
+            log.error("Error occurred while saving school with name: {}", createSchoolRequest.getName(), e);
             throw new InternalServerException("Unexpected error occurred");
         }
 
@@ -45,9 +47,10 @@ public class SchoolServiceImpl implements SchoolService {
     @Override
     public SchoolDetails getSchoolById(Long id) {
         try {
+            log.debug("Started fetching school with id: {}", id);
             School school = getSchool(id);
             log.debug("Successfully retrieved school details for id: {}", id);
-            return SchoolMapper.INSTANCE.toResponse(school);
+            return SchoolMapper.INSTANCE.mapToSchoolDetails(school);
         } catch (Exception e) {
             log.error("Error occurred while fetching school from db for id: {} ", id, e);
             throw new InternalServerException("Unexpected error occurred");
@@ -57,8 +60,10 @@ public class SchoolServiceImpl implements SchoolService {
     @Override
     public SchoolsResponse getSchools() {
         try {
+            log.debug("Started fetching all schools");
             List<School> schools = schoolRepository.findAll();
-            List<SchoolDetails> schoolDetails = SchoolMapper.INSTANCE.toSchoolDetails(schools);
+            List<SchoolDetails> schoolDetails = SchoolMapper.INSTANCE.mapToSchoolDetailsList(schools);
+            log.debug("Successfully fetched all schools");
             return SchoolsResponse.builder().users(schoolDetails).build();
         } catch (Exception e) {
             log.error("Error occurred while fetching schools from db ", e);
@@ -67,19 +72,22 @@ public class SchoolServiceImpl implements SchoolService {
     }
 
     @Override
-    public ResponseMessage updateSchool(CreateOrUpdateSchoolRequest createOrUpdateSchoolRequest, Long id) {
+    public ResponseMessage updateSchool(CreateOrUpdateSchoolRequest updateSchoolRequest, Long id) {
         try {
+            log.debug("Started updating school with id: {}", id);
             School school = getSchool(id);
-            SchoolMapper.INSTANCE.updateSchool(createOrUpdateSchoolRequest, school);
+            SchoolMapper.INSTANCE.updateSchool(updateSchoolRequest, school);
             schoolRepository.save(school);
+            log.debug("Successfully updated school with id: {}", id);
             return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_UPDATED_SUCCESSFULLY).build();
         } catch (Exception e) {
-            log.error("Error occurred while updating school with email: {}", createOrUpdateSchoolRequest.getName(), e);
+            log.error("Error occurred while updating school with email: {}", updateSchoolRequest.getName(), e);
             throw new InternalServerException("Unexpected error occurred");
         }
     }
 
-    private School getSchool(Long id) {
+    @Override
+    public School getSchool(Long id) {
         log.debug("Starting to fetch school details for id: {}", id);
         Optional<School> schoolOptional = schoolRepository.findById(id);
         if (schoolOptional.isEmpty()) {
@@ -87,5 +95,18 @@ public class SchoolServiceImpl implements SchoolService {
             throw new EntityNotFoundException(ErrorCodeConstant.SCHOOL_DOES_NOT_EXIST);
         }
         return schoolOptional.get();
+    }
+
+    @Override
+    public ResponseMessage deleteSchool(Long id) {
+        try {
+            log.debug("Started deleting school with id: {}", id);
+            schoolRepository.deleteById(id);
+            log.debug("Successfully deleted school with id: {}", id);
+            return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_DELETED_SUCCESSFULLY).build();
+        } catch (Exception e) {
+            log.error("Error occurred while deleting teacher with id: {}", id, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
     }
 }
