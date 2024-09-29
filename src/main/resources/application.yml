@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: Adolescent-Development-Program
+  profiles:
+    active: dev
+  jpa:
+    properties:
+      hibernate:
+        id:
+          db_structure_naming_strategy: legacy
+
+
+
+

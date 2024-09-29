@@ -1,55 +1,55 @@
 package in.gurujifoundation.domain;
 
+import in.gurujifoundation.audit.Auditable;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.envers.Audited;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+@EqualsAndHashCode(callSuper = false, exclude = {"teachers"})
+@ToString(exclude = {"teachers"})
 @Entity
 @Table(name = "school")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Audited
+@EntityListeners(AuditingEntityListener.class)
 @Builder
-public class School {
+public class School extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 255)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "address", length = 255)
+    @Column(name = "address")
     private String address;
 
-    @Column(name = "phone_number", length = 15)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "principal_name", length = 255)
+    @Column(name = "principal_name")
     private String principalName;
 
-    @Column(name = "principal_contact_no", length = 15)
+    @Column(name = "principal_contact_no")
     private String principalContactNo;
 
-    @Column(name = "managing_trustee", length = 255)
+    @Column(name = "managing_trustee")
     private String managingTrustee;
 
-    @Column(name = "trustee_contact_info", length = 15)
+    @Column(name = "trustee_contact_info")
     private String trusteeContactInfo;
 
-    @Column(name = "website", length = 255)
+    @Column(name = "website")
     private String website;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+    @OneToMany(mappedBy = "school")
+    @Builder.Default
+    private List<Teacher> teachers = new ArrayList<>();
 }

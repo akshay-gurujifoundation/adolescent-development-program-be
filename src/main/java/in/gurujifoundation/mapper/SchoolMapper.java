@@ -16,9 +16,6 @@ public interface SchoolMapper {
     SchoolMapper INSTANCE = Mappers.getMapper(SchoolMapper.class);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "deletedAt", ignore = true)
     School toEntity(CreateOrUpdateSchoolRequest request);
 
     @Mapping(target = "id", source = "school.id")
@@ -35,9 +32,6 @@ public interface SchoolMapper {
     List<SchoolDetails> toSchoolDetails(List<School> schools);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
-    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "name", source = "createOrUpdateSchoolRequest.name")
     @Mapping(target = "address", source = "createOrUpdateSchoolRequest.address")
     @Mapping(target = "phoneNumber", source = "createOrUpdateSchoolRequest.phoneNumber")

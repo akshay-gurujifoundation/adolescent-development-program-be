@@ -38,19 +38,94 @@ ALTER
 DATABASE adolescent_dev_program OWNER TO adolescent_user;
 
 
-      -- School Table
+-- Rev Info
+CREATE TABLE revinfo
+(
+    rev      SERIAL PRIMARY KEY,
+    revtstmp BIGINT NOT NULL
+);
+
+
+CREATE SEQUENCE hibernate_sequence
+    START WITH 1
+    INCREMENT BY 1;
+
+
+-- School Table
 CREATE TABLE school
 (
     id                   SERIAL PRIMARY KEY,
     name                 VARCHAR(255) NOT NULL,
-    address              VARCHAR(255),
-    phone_number         VARCHAR(15),
-    principal_name       VARCHAR(255),
-    principal_contact_no VARCHAR(15),
+    address              VARCHAR(255) NOT NULL,
+    phone_number         VARCHAR(15)  NOT NULL,
+    principal_name       VARCHAR(255) NOT NULL,
+    principal_contact_no VARCHAR(15)  NOT NULL,
     managing_trustee     VARCHAR(255),
     trustee_contact_info VARCHAR(15),
     website              VARCHAR(255),
-    created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at           TIMESTAMP
+    created_by           VARCHAR(255) NOT NULL,
+    created_at           TIMESTAMP    NOT NULL,
+    updated_by           VARCHAR(255) NOT NULL,
+    updated_at           TIMESTAMP    NOT NULL
 );
+
+CREATE INDEX idx_school_id ON school (id);
+
+
+
+CREATE TABLE school_aud
+(
+    id                   INT          NOT NULL,
+    rev                  INT          NOT NULL,
+    revtype              SMALLINT     NOT NULL,
+    name                 VARCHAR(255) NOT NULL,
+    address              VARCHAR(255) NOT NULL,
+    phone_number         VARCHAR(15)  NOT NULL,
+    principal_name       VARCHAR(255) NOT NULL,
+    principal_contact_no VARCHAR(15)  NOT NULL,
+    managing_trustee     VARCHAR(255),
+    trustee_contact_info VARCHAR(15),
+    website              VARCHAR(255),
+    created_by           VARCHAR(255) NOT NULL,
+    created_at           TIMESTAMP    NOT NULL,
+    updated_by           VARCHAR(255) NOT NULL,
+    updated_at           TIMESTAMP    NOT NULL,
+    PRIMARY KEY (id, rev),
+    FOREIGN KEY (rev) REFERENCES revinfo (rev)
+);
+
+
+-- Teacher Table
+CREATE TABLE teacher
+(
+    id         SERIAL PRIMARY KEY,
+    school_id  INT REFERENCES school (id) NOT NULL,
+    name       VARCHAR(255)               NOT NULL,
+    experience INT                        NOT NULL,
+    created_by VARCHAR(255)               NOT NULL,
+    created_at TIMESTAMP                  NOT NULL,
+    updated_by VARCHAR(255)               NOT NULL,
+    updated_at TIMESTAMP                  NOT NULL
+);
+
+
+CREATE INDEX idx_teacher_school_id ON teacher (school_id);
+
+
+CREATE TABLE teacher_aud
+(
+    id         INT          NOT NULL,
+    rev        INT          NOT NULL,
+    revtype    SMALLINT     NOT NULL,
+    school_id  INT          NOT NULL,
+    name       VARCHAR(255) NOT NULL,
+    experience INT          NOT NULL,
+    created_by VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP    NOT NULL,
+    updated_by VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMP    NOT NULL,
+    PRIMARY KEY (id, rev),
+    FOREIGN KEY (school_id) REFERENCES school (id),
+    FOREIGN KEY (rev) REFERENCES revinfo (rev)
+);
+
