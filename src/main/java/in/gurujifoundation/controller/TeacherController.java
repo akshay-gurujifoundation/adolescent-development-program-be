@@ -74,7 +74,7 @@ public class TeacherController {
     }
 
     @Operation(
-            summary = "Get Teacher by ID",
+            summary = "Get Teacher by id",
             description = "Endpoint to retrieve teacher details by id",
             security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
     )
