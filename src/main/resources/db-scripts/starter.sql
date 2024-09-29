@@ -129,3 +129,89 @@ CREATE TABLE teacher_aud
     FOREIGN KEY (rev) REFERENCES revinfo (rev)
 );
 
+
+--Parent Table
+CREATE TABLE parent
+(
+    id           SERIAL PRIMARY KEY,
+    name         VARCHAR(255) NOT NULL,
+    occupation   VARCHAR(255),
+    phone_number VARCHAR(15)  NOT NULL,
+    created_by   VARCHAR(255) NOT NULL,
+    created_at   TIMESTAMP    NOT NULL,
+    updated_by   VARCHAR(255) NOT NULL,
+    updated_at   TIMESTAMP    NOT NULL
+);
+
+
+create index idx_parent_id
+    on parent (id);
+
+
+
+create table parent_aud
+(
+    id           INTEGER      NOT NULL,
+    rev          INTEGER      NOT NULL
+        references revinfo,
+    revtype      smallint     not null,
+    name         VARCHAR(255) NOT NULL,
+    occupation   VARCHAR(255),
+    phone_number VARCHAR(15)  NOT NULL,
+    created_by   VARCHAR(255) NOT NULL,
+    created_at   TIMESTAMP    NOT NULL,
+    updated_by   VARCHAR(255) NOT NULL,
+    updated_at   TIMESTAMP    NOT NULL,
+    primary key (id, rev)
+);
+
+
+--Student Table
+CREATE TABLE student
+(
+    id                 SERIAL PRIMARY KEY,
+    school_id          INT REFERENCES school (id) NOT NULL,
+    name               VARCHAR(255)               NOT NULL,
+    dob                DATE                       NOT NULL,
+    parent_id          INT REFERENCES parent (id) NOT NULL,
+    address            VARCHAR(255)               NOT NULL,
+    phone_number       VARCHAR(15)                NOT NULL,
+    alternative_number VARCHAR(15),
+    email              VARCHAR(255)               NOT NULL,
+    created_by         VARCHAR(255)               NOT NULL,
+    created_at         TIMESTAMP                  NOT NULL,
+    updated_by         VARCHAR(255)               NOT NULL,
+    updated_at         TIMESTAMP                  NOT NULL
+);
+
+create index idx_student_id
+    on student (id);
+
+create index idx_student_school_id
+    on student (id, school_id);
+
+
+
+create table student_aud
+(
+    id                 INTEGER                    NOT NULL,
+    rev                INTEGER                    NOT NULL
+        references revinfo,
+    revtype            smallint                   not null,
+    school_id          INT REFERENCES school (id) NOT NULL,
+    name               VARCHAR(255)               NOT NULL,
+    dob                DATE                       NOT NULL,
+    parent_id          INT REFERENCES parent (id) NOT NULL,
+    address            VARCHAR(255)               NOT NULL,
+    phone_number       VARCHAR(15)                NOT NULL,
+    alternative_number VARCHAR(15),
+    email              VARCHAR(255)               NOT NULL,
+    created_by         VARCHAR(255)               NOT NULL,
+    created_at         TIMESTAMP                  NOT NULL,
+    updated_by         VARCHAR(255)               NOT NULL,
+    updated_at         TIMESTAMP                  NOT NULL,
+    primary key (id, rev)
+);
+
+
+
