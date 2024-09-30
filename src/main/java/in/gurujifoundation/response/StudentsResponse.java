@@ -16,12 +16,12 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode
-public class SchoolsResponse {
+public class StudentsResponse {
 
-    @Schema(description = "School Details")
+    @Schema(description = "Student Details")
     @NotNull
     @NotEmpty
     @Builder.Default
-    private List<SchoolDetails> students = new ArrayList<>();
+    private List<StudentDetails> students = new ArrayList<>();
 
 }

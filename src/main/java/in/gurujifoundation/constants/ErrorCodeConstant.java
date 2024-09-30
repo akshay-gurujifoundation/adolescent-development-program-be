@@ -10,4 +10,6 @@ public interface ErrorCodeConstant {
     String TEACHER_DOES_NOT_EXIST = "Teacher does not exist";
     String TEACHER_DELETED_SUCCESSFULLY = "Teacher deleted successfully";
     String SCHOOL_DELETED_SUCCESSFULLY = "School deleted successfully";
+    String STUDENT_CREATED_SUCCESSFULLY = "Student created successfully";
+    String STUDENT_DOES_NOT_EXIST = "School does not exist";
 }
