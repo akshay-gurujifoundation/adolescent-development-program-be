@@ -107,7 +107,7 @@ public class StudentController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping(path = "/advanced-query")
+    @GetMapping
     public ResponseEntity<?> getStudents() {
         StudentsResponse studentsResponse = studentService.getStudents();
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(studentsResponse).build());

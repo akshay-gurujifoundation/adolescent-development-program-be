@@ -64,7 +64,7 @@ public class SchoolServiceImpl implements SchoolService {
             List<School> schools = schoolRepository.findAll();
             List<SchoolDetails> schoolDetails = SchoolMapper.INSTANCE.mapToSchoolDetailsList(schools);
             log.debug("Successfully fetched all schools");
-            return SchoolsResponse.builder().users(schoolDetails).build();
+            return SchoolsResponse.builder().students(schoolDetails).build();
         } catch (Exception e) {
             log.error("Error occurred while fetching schools from db ", e);
             throw new InternalServerException("Unexpected error occurred");
