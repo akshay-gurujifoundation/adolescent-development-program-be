@@ -1,11 +1,13 @@
 package in.gurujifoundation.service.impl;
 
 import in.gurujifoundation.constants.ErrorCodeConstant;
+import in.gurujifoundation.domain.Parent;
 import in.gurujifoundation.domain.School;
 import in.gurujifoundation.domain.Student;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.StudentMapper;
+import in.gurujifoundation.repository.ParentRepository;
 import in.gurujifoundation.repository.StudentRepository;
 import in.gurujifoundation.request.CreateOrUpdateStudentRequest;
 import in.gurujifoundation.response.*;
@@ -24,11 +26,14 @@ public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
 
+    private final ParentRepository parentRepository;
+
     private final SchoolService schoolService;
 
     @Autowired
-    public StudentServiceImpl(StudentRepository studentRepository, SchoolService schoolService) {
+    public StudentServiceImpl(StudentRepository studentRepository, ParentRepository parentRepository, SchoolService schoolService) {
         this.studentRepository = studentRepository;
+        this.parentRepository = parentRepository;
         this.schoolService = schoolService;
     }
 
@@ -37,6 +42,8 @@ public class StudentServiceImpl implements StudentService {
         try {
             SchoolDetails school = schoolService.getSchoolById(request.getSchoolId());
             Student student = StudentMapper.INSTANCE.toEntity(request,school);
+            Parent parent = student.getParent();
+            parentRepository.save(parent);
             studentRepository.save(student);
             return ResponseMessage.builder().message(ErrorCodeConstant.STUDENT_CREATED_SUCCESSFULLY).build();
         } catch (Exception e) {
@@ -80,6 +87,19 @@ public class StudentServiceImpl implements StudentService {
             return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_UPDATED_SUCCESSFULLY).build();
         } catch (Exception e) {
             log.error("Error occurred while updating student with email: {}", request.getEmail(), e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
+
+    @Override
+    public ResponseMessage deleteStudent(Long id) {
+        try {
+            log.debug("Started deleting student with id: {}", id);
+            studentRepository.deleteById(id);
+            log.debug("Successfully deleted student with id: {}", id);
+            return ResponseMessage.builder().message(ErrorCodeConstant.STUDENT_DELETED_SUCCESSFULLY).build();
+        } catch (Exception e) {
+            log.error("Error occurred while deleting student with id: {}", id, e);
             throw new InternalServerException("Unexpected error occurred");
         }
     }

@@ -50,7 +50,6 @@ public interface StudentMapper {
     @Mapping(target = "phoneNumber", source = "studentDetails.phoneNumber")
     @Mapping(target = "alternativeNumber", source = "studentDetails.alternativeNumber")
     @Mapping(target = "email", source = "studentDetails.email")
-    @Mapping(target = "parent", source = "studentDetails.parent")
     @Mapping(target = "school", source = "school")
     void updateStudent(CreateOrUpdateStudentRequest studentDetails, @MappingTarget Student student, School school);
 }

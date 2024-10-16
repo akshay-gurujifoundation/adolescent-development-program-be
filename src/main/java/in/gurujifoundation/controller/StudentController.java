@@ -112,4 +112,23 @@ public class StudentController {
         StudentsResponse studentsResponse = studentService.getStudents();
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(studentsResponse).build());
     }
+
+    @Operation(
+            summary = "Delete Student by id",
+            description = "Endpoint to delete student by id",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Student deleted successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteStudent(@PathVariable Long id) {
+        ResponseMessage responseMessage = studentService.deleteStudent(id);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
 }

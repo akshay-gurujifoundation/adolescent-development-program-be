@@ -49,7 +49,11 @@ public class School extends Auditable {
     @Column(name = "website")
     private String website;
 
-    @OneToMany(mappedBy = "school")
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Teacher> teachers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Student> students = new ArrayList<>();
 }

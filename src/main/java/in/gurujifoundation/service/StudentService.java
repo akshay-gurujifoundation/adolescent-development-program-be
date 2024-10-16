@@ -12,4 +12,6 @@ public interface StudentService {
     StudentsResponse getStudents();
 
     ResponseMessage updateStudent(CreateOrUpdateStudentRequest createOrUpdateStudentRequest, Long id);
+
+    ResponseMessage deleteStudent(Long id);
 }

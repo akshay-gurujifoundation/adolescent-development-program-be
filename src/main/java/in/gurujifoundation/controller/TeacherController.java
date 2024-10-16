@@ -114,7 +114,7 @@ public class TeacherController {
     }
 
     @Operation(
-            summary = "Delete School by id",
+            summary = "Delete Teacher by id",
             description = "Endpoint to delete teacher by id",
             security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
     )

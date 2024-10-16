@@ -12,4 +12,6 @@ public interface ErrorCodeConstant {
     String SCHOOL_DELETED_SUCCESSFULLY = "School deleted successfully";
     String STUDENT_CREATED_SUCCESSFULLY = "Student created successfully";
     String STUDENT_DOES_NOT_EXIST = "School does not exist";
+    String STUDENT_DELETED_SUCCESSFULLY = "Student deleted successfully";
+
 }

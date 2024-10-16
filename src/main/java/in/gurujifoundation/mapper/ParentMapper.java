@@ -29,5 +29,5 @@ public interface ParentMapper {
     @Mapping(target = "name", source = "parentDetails.name")
     @Mapping(target = "occupation", source = "parentDetails.occupation")
     @Mapping(target = "phoneNumber", source = "parentDetails.phoneNumber")
-    void updateParent(ParentDetails parentDetails, @MappingTarget Parent parent);
+    void updateParent(CreateOrUpdateParentRequest parentDetails, @MappingTarget Parent parent);
 }
