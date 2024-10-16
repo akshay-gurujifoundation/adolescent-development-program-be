@@ -11,6 +11,7 @@ This project is a Spring Boot application designed to manage the backend service
     - [Opening the Project in IntelliJ IDEA](#opening-the-project-in-intellij-idea)
     - [Setting the Java Version in IntelliJ IDEA](#setting-the-java-version-in-intellij-idea)
 - [Running the Project](#running-the-project)
+- [Accessing the API Documentation](#accessing-the-api-documentation)
 - [Testing](#testing)
 - [Contributing](#contributing)
 - [Troubleshooting](#troubleshooting)
@@ -103,7 +104,16 @@ Alternatively, you can run the project from the terminal:
 3. Access the application at `http://localhost:8080`.
 
 ---
+## Accessing the API Documentation
 
+This project uses Swagger to automatically generate API documentation.
+
+After running the application, you can access the Swagger UI for API documentation and testing at: [Swagger UI](http://localhost:8080/swagger-ui/index.html)
+
+
+The Swagger UI provides an interactive interface for exploring and testing all available APIs.
+
+---
 ## Testing
 
 The project includes unit and integration tests. You can run the tests using:
