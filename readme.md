@@ -129,6 +129,7 @@ For local development, the project uses an in-memory H2 database. You can access
 When accessing the H2 console, enter the above credentials to connect to the in-memory database.
 
 Here’s a screenshot of the H2 Console setup: ![H2 Console Login](assets/h2-console.png)
+> **Note**: This project uses an in-memory database for local development, which means **all data will be lost once you restart the project**. This is because the H2 database is not persisted to disk.
 
 
 ## Testing
