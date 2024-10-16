@@ -11,6 +11,7 @@ This project is a Spring Boot application designed to manage the backend service
     - [Opening the Project in IntelliJ IDEA](#opening-the-project-in-intellij-idea)
     - [Setting the Java Version in IntelliJ IDEA](#setting-the-java-version-in-intellij-idea)
 - [Running the Project](#running-the-project)
+- [Accessing the H2 Database](#accessing-the-h2-database)
 - [Accessing the API Documentation](#accessing-the-api-documentation)
 - [Testing](#testing)
 - [Contributing](#contributing)
@@ -114,6 +115,22 @@ After running the application, you can access the Swagger UI for API documentati
 The Swagger UI provides an interactive interface for exploring and testing all available APIs.
 
 ---
+
+## Accessing the H2 Database
+
+For local development, the project uses an in-memory H2 database. You can access the H2 console to view and interact with the database at: [H2 Console](http://localhost:8080/h2-console)
+
+### Database Credentials
+
+- **JDBC URL**: `jdbc:h2:mem:adolescent_dev_program`
+- **Username**: `adolescent_user`
+- **Password**: `Adolescent@123`
+
+When accessing the H2 console, enter the above credentials to connect to the in-memory database.
+
+Here’s a screenshot of the H2 Console setup: ![H2 Console Login](assets/h2-console.png)
+
+
 ## Testing
 
 The project includes unit and integration tests. You can run the tests using:
