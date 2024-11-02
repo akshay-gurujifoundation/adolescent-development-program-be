@@ -1,0 +1,114 @@
+package in.gurujifoundation.service.impl;
+
+import in.gurujifoundation.constants.ErrorCodeConstant;
+import in.gurujifoundation.domain.Project;
+import in.gurujifoundation.domain.School;
+import in.gurujifoundation.exception.EntityNotFoundException;
+import in.gurujifoundation.exception.InternalServerException;
+import in.gurujifoundation.mapper.ProjectMapper;
+import in.gurujifoundation.repository.ProjectRepository;
+import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
+import in.gurujifoundation.response.*;
+import in.gurujifoundation.service.ProjectService;
+import in.gurujifoundation.service.SchoolService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Slf4j
+@Service
+public class ProjectServiceImpl implements ProjectService {
+
+    private final SchoolService schoolService;
+
+    private final ProjectRepository projectRepository;
+
+    public ProjectServiceImpl(SchoolService schoolService, ProjectRepository projectRepository) {
+        this.schoolService = schoolService;
+        this.projectRepository = projectRepository;
+    }
+
+    @Override
+    public ResponseMessage createProject(CreateOrUpdateProjectRequest createOrUpdateProjectRequest) {
+        try {
+            log.debug("Started saving project with name: {}", createOrUpdateProjectRequest.getName());
+            School school = schoolService.getSchool(createOrUpdateProjectRequest.getSchoolId());
+            Project project = ProjectMapper.INSTANCE.mapToEntity(createOrUpdateProjectRequest, school);
+            projectRepository.save(project);
+            log.debug("Successfully saved project with name: {}", createOrUpdateProjectRequest.getName());
+            return ResponseMessage.builder().message(ErrorCodeConstant.PROJECT_CREATED_SUCCESSFULLY).build();
+        } catch (Exception e) {
+            log.error("Error occurred while saving project with name: {}", createOrUpdateProjectRequest.getName(), e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
+
+    @Override
+    public ProjectDetails getProjectById(Long id) {
+        try {
+            log.debug("Started fetching project with id: {}", id);
+            Project project = getProject(id);
+            log.debug("Successfully retrieved project with id: {}", id);
+            return ProjectMapper.INSTANCE.mapToProjectDetailsResponse(project);
+        } catch (Exception e) {
+            log.error("Error occurred while fetching project with id: {} ", id, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
+
+    @Override
+    public ResponseMessage updateProject(CreateOrUpdateProjectRequest updateProjectRequest, Long id) {
+        try {
+            log.debug("Started updating project with id: {}", id);
+            School school = schoolService.getSchool(updateProjectRequest.getSchoolId());
+            Project Project = getProject(id);
+            ProjectMapper.INSTANCE.updateProject(Project, updateProjectRequest, school);
+            projectRepository.save(Project);
+            log.debug("Successfully updated project with id: {}", id);
+            return ResponseMessage.builder().message(ErrorCodeConstant.PROJECT_UPDATED_SUCCESSFULLY).build();
+        } catch (Exception e) {
+            log.error("Error occurred while updating Project with id: {}", id, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
+
+    @Override
+    public ProjectResponse getAllProjects() {
+        try {
+            log.debug("Started fetching all projects");
+            List<Project> projects = projectRepository.findAll();
+            List<ProjectDetails> ProjectDetails = ProjectMapper.INSTANCE.mapToProjectDetailsList(projects);
+            log.debug("Successfully fetched all projects");
+            return ProjectResponse.builder().projects(ProjectDetails).build();
+        } catch (Exception e) {
+            log.error("Error occurred while fetching all projects", e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
+
+    @Override
+    public ResponseMessage deleteProject(Long id) {
+        try {
+            log.debug("Started deleting project with id: {}", id);
+            projectRepository.deleteById(id);
+            log.debug("Successfully deleted project with id: {}", id);
+            return ResponseMessage.builder().message(ErrorCodeConstant.PROJECT_DELETED_SUCCESSFULLY).build();
+        } catch (Exception e) {
+            log.error("Error occurred while deleting project with id: {}", id, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
+
+    @Override
+    public Project getProject(Long id) {
+        log.debug("Starting to fetch project details for id: {}", id);
+        Optional<Project> projectOptional = projectRepository.findById(id);
+        if (projectOptional.isEmpty()) {
+            log.warn("No project found for id: {}", id);
+            throw new EntityNotFoundException(ErrorCodeConstant.PROJECT_DOES_NOT_EXIST);
+        }
+        return projectOptional.get();
+    }
+}

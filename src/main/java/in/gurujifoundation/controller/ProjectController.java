@@ -1,0 +1,130 @@
+package in.gurujifoundation.controller;
+
+import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
+import in.gurujifoundation.response.*;
+import in.gurujifoundation.service.ProjectService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/projects")
+@Tag(name = "Project")
+public class ProjectController {
+
+    private final ProjectService projectService;
+
+    public ProjectController(ProjectService projectService) {
+        this.projectService = projectService;
+    }
+
+    @Operation(
+            summary = "Save Project",
+            description = "Endpoint to save Project",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Project created successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @PostMapping
+    public ResponseEntity<?> createProject(@RequestBody @Valid CreateOrUpdateProjectRequest createOrUpdateProjectRequest) {
+        ResponseMessage responseMessage = projectService.createProject(createOrUpdateProjectRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
+
+    @Operation(
+            summary = "Update Project",
+            description = "Endpoint to update project",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Project updated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProject(@RequestBody @Valid CreateOrUpdateProjectRequest updateProjectRequest, @PathVariable Long id) {
+        ResponseMessage responseMessage = projectService.updateProject(updateProjectRequest, id);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
+    @Operation(
+            summary = "Get Project by id",
+            description = "Endpoint to retrieve project details by id",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Project details retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectDetails.class))),
+            @ApiResponse(responseCode = "404", description = "School not found", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getProjectById(@PathVariable Long id) {
+        ProjectDetails projectDetails = projectService.getProjectById(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(APIResponse.builder().status(Boolean.TRUE).data(projectDetails).build());
+    }
+
+    @Operation(
+            summary = "Get all projects",
+            description = "Endpoint to retrieve all projects",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Projects retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @GetMapping
+    public ResponseEntity<?> getAllProjects() {
+        ProjectResponse projectResponse = projectService.getAllProjects();
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(projectResponse).build());
+    }
+
+    @Operation(
+            summary = "Delete Project by id",
+            description = "Endpoint to delete project by id",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Project deleted successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProject(@PathVariable Long id) {
+        ResponseMessage responseMessage = projectService.deleteProject(id);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+}
