@@ -22,6 +22,6 @@ public class SchoolsResponse {
     @NotNull
     @NotEmpty
     @Builder.Default
-    private List<SchoolDetails> students = new ArrayList<>();
+    private List<SchoolDetails> schools = new ArrayList<>();
 
 }
