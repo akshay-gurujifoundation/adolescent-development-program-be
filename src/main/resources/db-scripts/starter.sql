@@ -193,21 +193,82 @@ create index idx_student_school_id
 
 create table student_aud
 (
-    id                 INTEGER      NOT NULL,
-    rev                INTEGER      NOT NULL
+    id                 INTEGER  NOT NULL,
+    rev                INTEGER  NOT NULL
         references revinfo,
-    revtype            smallint     NOT NULL,
-    school_id          INTEGER      NULL, -- Allow NULL for deletion
+    revtype            smallint NOT NULL,
+    school_id          INTEGER NULL,      -- Allow NULL for deletion
     name               VARCHAR(255) NULL, -- Allow NULL for deletion
-    dob                DATE         NULL, -- Allow NULL for deletion
-    parent_id          INTEGER      NULL, -- Allow NULL for deletion
+    dob                DATE NULL,         -- Allow NULL for deletion
+    parent_id          INTEGER NULL,      -- Allow NULL for deletion
     address            VARCHAR(255) NULL, -- Allow NULL for deletion
-    phone_number       VARCHAR(15)  NULL, -- Allow NULL for deletion
-    alternative_number VARCHAR(15)  NULL,
+    phone_number       VARCHAR(15) NULL,  -- Allow NULL for deletion
+    alternative_number VARCHAR(15) NULL,
     email              VARCHAR(255) NULL, -- Allow NULL for deletion
     created_by         VARCHAR(255),
     created_at         TIMESTAMP,
     updated_by         VARCHAR(255),
     updated_at         TIMESTAMP,
     primary key (id, rev)
+);
+
+CREATE TABLE project
+(
+    id                SERIAL PRIMARY KEY,
+    name              VARCHAR(255) NOT NULL,
+    description       TEXT,
+    start_date        DATE,
+    end_date          DATE,
+    actual_start_date DATE,
+    actual_end_date   DATE,
+    status            VARCHAR(50),
+    school_id         BIGINT       NOT NULL,
+    CONSTRAINT fk_project_school_id FOREIGN KEY (school_id) REFERENCES school (id),
+    CONSTRAINT project_idx_school_id UNIQUE (school_id)
+);
+
+CREATE TABLE project_aud
+(
+    id                BIGINT,
+    rev               INT,
+    revtype           SMALLINT,     -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
+    name              VARCHAR(255), -- Audited field 'name'
+    description       TEXT,         -- Audited field 'description'
+    start_date        DATE,         -- Audited field 'startDate'
+    end_date          DATE,         -- Audited field 'endDate'
+    actual_start_date DATE,         -- Audited field 'actualStartDate'
+    actual_end_date   DATE,         -- Audited field 'actualEndDate'
+    status            VARCHAR(50),  -- Audited field 'status'
+    school_id         BIGINT,       -- Audited field 'school_id' (foreign key reference)
+
+    PRIMARY KEY (id, rev)           -- Composite primary key
+);
+
+
+CREATE TABLE performance
+(
+    id               SERIAL PRIMARY KEY,
+    student_id       BIGINT NOT NULL,
+    project_id       BIGINT NOT NULL,
+    attendance_grade VARCHAR(10),
+
+    CONSTRAINT fk_performance_student_id FOREIGN KEY (student_id) REFERENCES student (id),
+    CONSTRAINT fk_performance_project_id FOREIGN KEY (project_id) REFERENCES project (id)
+);
+
+-- Indexes to speed up queries on foreign key columns
+CREATE INDEX idx_performance_student_id ON performance (student_id);
+CREATE INDEX idx_performance_project_id ON performance (project_id);
+
+
+CREATE TABLE performance_aud
+(
+    id               BIGINT,      -- ID of the Performance being audited
+    rev              INT,         -- Revision number
+    revtype          SMALLINT,    -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
+    student_id       BIGINT,      -- Audited field 'student_id' (foreign key reference)
+    project_id       BIGINT,      -- Audited field 'project_id' (foreign key reference)
+    attendance_grade VARCHAR(10), -- Audited field 'attendance_grade'
+
+    PRIMARY KEY (id, rev)         -- Composite primary key
 );
