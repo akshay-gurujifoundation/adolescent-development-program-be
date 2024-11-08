@@ -104,7 +104,8 @@ public class StudentServiceImpl implements StudentService {
         }
     }
 
-    private Student getStudent(Long id) {
+    @Override
+    public Student getStudent(Long id) {
         log.debug("Starting to fetch student details for id: {}", id);
         Optional<Student> studentOptional = studentRepository.findById(id);
         if (studentOptional.isEmpty()) {

@@ -11,7 +11,14 @@ public interface ErrorCodeConstant {
     String TEACHER_DELETED_SUCCESSFULLY = "Teacher deleted successfully";
     String SCHOOL_DELETED_SUCCESSFULLY = "School deleted successfully";
     String STUDENT_CREATED_SUCCESSFULLY = "Student created successfully";
-    String STUDENT_DOES_NOT_EXIST = "School does not exist";
+    String STUDENT_DOES_NOT_EXIST = "Student does not exist";
     String STUDENT_DELETED_SUCCESSFULLY = "Student deleted successfully";
-
+    String PROJECT_DOES_NOT_EXIST = "Project does not exist";
+    String PROJECT_DELETED_SUCCESSFULLY = "Project deleted successfully";
+    String PROJECT_UPDATED_SUCCESSFULLY = "Project updated successfully";
+    String PROJECT_CREATED_SUCCESSFULLY = "Project created successfully";
+    String PERFORMANCE_CREATED_SUCCESSFULLY = "Performance saved successfully";
+    String PERFORMANCE_UPDATED_SUCCESSFULLY = "Performance updated successfully";
+    String PERFORMANCE_DELETED_SUCCESSFULLY = "Performance deleted successfully";
+    String PERFORMANCE_DOES_NOT_EXIST = "Performance does not exist";
 }
