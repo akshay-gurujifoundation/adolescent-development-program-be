@@ -2,7 +2,7 @@ spring:
   application:
     name: Adolescent-Development-Program
   profiles:
-    active: test
+    active: dev
   jpa:
     properties:
       hibernate:
