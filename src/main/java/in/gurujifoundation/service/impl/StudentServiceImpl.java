@@ -2,7 +2,6 @@ package in.gurujifoundation.service.impl;
 
 import in.gurujifoundation.constants.ErrorCodeConstant;
 import in.gurujifoundation.domain.Parent;
-import in.gurujifoundation.domain.Project;
 import in.gurujifoundation.domain.School;
 import in.gurujifoundation.domain.Student;
 import in.gurujifoundation.exception.EntityNotFoundException;
@@ -18,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -129,5 +129,17 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public void updateStudents(List<Student> students) {
         studentRepository.saveAll(students);
+    }
+
+    @Override
+    public StudentsResponse getUnassignedStudentToProject(Long schoolId, Long projectId) {
+        try {
+            List<Student> students = studentRepository.findAllBySchoolIdAndExcludeProject(schoolId, projectId);
+            List<StudentDetails> studentDetails = StudentMapper.INSTANCE.toStudentsDetails(students);
+            return StudentsResponse.builder().students(studentDetails).build();
+        } catch (Exception e) {
+            log.error("Error occurred while fetching students from db ", e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
     }
 }
