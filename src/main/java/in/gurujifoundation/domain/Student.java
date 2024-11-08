@@ -2,21 +2,24 @@ package in.gurujifoundation.domain;
 
 import in.gurujifoundation.audit.Auditable;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
+@Builder
 @Data
 @Entity
 @Audited
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "student")
-@EqualsAndHashCode(callSuper = false, exclude = {"parent"})
+@EqualsAndHashCode(callSuper = false, exclude = {"parent", "projects", "school"})
 @ToString(exclude = {"parent"})
+@NoArgsConstructor
+@AllArgsConstructor
 public class Student extends Auditable {
 
     @Id
@@ -49,4 +52,15 @@ public class Student extends Auditable {
 
     @Column(name = "email", nullable = false)
     private String email;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "student_project",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id")
+    )
+    @Builder.Default
+    private Set<Project> projects = new HashSet<>();
+
 }

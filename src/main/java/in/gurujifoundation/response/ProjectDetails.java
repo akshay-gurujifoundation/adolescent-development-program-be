@@ -3,6 +3,7 @@ package in.gurujifoundation.response;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,5 +19,6 @@ public class ProjectDetails {
     private LocalDate actualStartDate;
     private LocalDate actualEndDate;
     private String status;
-    private SchoolDetails schoolDetails;
+    private SchoolDetails school;
+    List<StudentDetails> students;
 }

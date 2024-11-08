@@ -21,4 +21,7 @@ public interface ErrorCodeConstant {
     String PERFORMANCE_UPDATED_SUCCESSFULLY = "Performance updated successfully";
     String PERFORMANCE_DELETED_SUCCESSFULLY = "Performance deleted successfully";
     String PERFORMANCE_DOES_NOT_EXIST = "Performance does not exist";
+    String ID_CANT_BE_BLANK = "The ID can't be blank";
+    String STUDENTS_ALLOCATED_TO_PROJECT_SUCCESSFULLY = "Students allocated to project successfully";
+    String STUDENTS_DE_ALLOCATED_TO_PROJECT_SUCCESSFULLY = "Students de-allocated to project successfully";
 }

@@ -2,6 +2,7 @@ package in.gurujifoundation.service.impl;
 
 import in.gurujifoundation.constants.ErrorCodeConstant;
 import in.gurujifoundation.domain.Parent;
+import in.gurujifoundation.domain.Project;
 import in.gurujifoundation.domain.School;
 import in.gurujifoundation.domain.Student;
 import in.gurujifoundation.exception.EntityNotFoundException;
@@ -41,7 +42,7 @@ public class StudentServiceImpl implements StudentService {
     public ResponseMessage createStudent(CreateOrUpdateStudentRequest request) {
         try {
             SchoolDetails school = schoolService.getSchoolById(request.getSchoolId());
-            Student student = StudentMapper.INSTANCE.toEntity(request,school);
+            Student student = StudentMapper.INSTANCE.toEntity(request, school);
             Parent parent = student.getParent();
             parentRepository.save(parent);
             studentRepository.save(student);
@@ -66,9 +67,14 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public StudentsResponse getStudents() {
+    public StudentsResponse getStudents(Long schoolId) {
         try {
-            List<Student> students = studentRepository.findAll();
+            List<Student> students;
+            if (schoolId != null) {
+                students = studentRepository.findAllBySchoolId(schoolId);
+            } else {
+                students = studentRepository.findAll();
+            }
             List<StudentDetails> studentDetails = StudentMapper.INSTANCE.toStudentsDetails(students);
             return StudentsResponse.builder().students(studentDetails).build();
         } catch (Exception e) {
@@ -82,7 +88,7 @@ public class StudentServiceImpl implements StudentService {
         try {
             Student student = getStudent(id);
             School school = schoolService.getSchool(request.getSchoolId());
-            StudentMapper.INSTANCE.updateStudent(request, student,school);
+            StudentMapper.INSTANCE.updateStudent(request, student, school);
             studentRepository.save(student);
             return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_UPDATED_SUCCESSFULLY).build();
         } catch (Exception e) {
@@ -113,5 +119,15 @@ public class StudentServiceImpl implements StudentService {
             throw new EntityNotFoundException(ErrorCodeConstant.STUDENT_DOES_NOT_EXIST);
         }
         return studentOptional.get();
+    }
+
+    @Override
+    public List<Student> getStudentsByIds(List<Long> ids) {
+        return studentRepository.findAllById(ids);
+    }
+
+    @Override
+    public void updateStudents(List<Student> students) {
+        studentRepository.saveAll(students);
     }
 }

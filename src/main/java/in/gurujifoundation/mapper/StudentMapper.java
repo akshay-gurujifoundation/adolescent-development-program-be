@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(uses = {SchoolMapper.class})
 public interface StudentMapper {
 
     StudentMapper INSTANCE = Mappers.getMapper(StudentMapper.class);
@@ -39,6 +39,7 @@ public interface StudentMapper {
     @Mapping(target = "alternativeNumber", source = "student.alternativeNumber")
     @Mapping(target = "email", source = "student.email")
     @Mapping(target = "parent", source = "student.parent")
+    @Mapping(target = "schoolDetails", source = "school")
     StudentDetails toStudentDetails(Student student);
 
     List<StudentDetails> toStudentsDetails(List<Student> students);

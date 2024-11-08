@@ -108,8 +108,8 @@ public class StudentController {
     })
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
-    public ResponseEntity<?> getStudents() {
-        StudentsResponse studentsResponse = studentService.getStudents();
+    public ResponseEntity<?> getStudents(@RequestParam(value = "schoolId", required = false) Long schoolId) {
+        StudentsResponse studentsResponse = studentService.getStudents(schoolId);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(studentsResponse).build());
     }
 

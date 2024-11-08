@@ -3,19 +3,23 @@ package in.gurujifoundation.service.impl;
 import in.gurujifoundation.constants.ErrorCodeConstant;
 import in.gurujifoundation.domain.Project;
 import in.gurujifoundation.domain.School;
+import in.gurujifoundation.domain.Student;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.ProjectMapper;
 import in.gurujifoundation.repository.ProjectRepository;
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
+import in.gurujifoundation.request.ProjectStudentAllocationDeAllocationRequest;
 import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.ProjectService;
 import in.gurujifoundation.service.SchoolService;
+import in.gurujifoundation.service.StudentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -25,9 +29,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
 
-    public ProjectServiceImpl(SchoolService schoolService, ProjectRepository projectRepository) {
+    private final StudentService studentService;
+
+    public ProjectServiceImpl(SchoolService schoolService, ProjectRepository projectRepository, StudentService studentService) {
         this.schoolService = schoolService;
         this.projectRepository = projectRepository;
+        this.studentService = studentService;
     }
 
     @Override
@@ -75,10 +82,15 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectResponse getAllProjects() {
+    public ProjectResponse getAllProjects(Long schoolId) {
         try {
             log.debug("Started fetching all projects");
-            List<Project> projects = projectRepository.findAll();
+            List<Project> projects;
+            if (schoolId != null) {
+                projects = projectRepository.findAllBySchoolId(schoolId);
+            } else {
+                projects = projectRepository.findAll();
+            }
             List<ProjectDetails> ProjectDetails = ProjectMapper.INSTANCE.mapToProjectDetailsList(projects);
             log.debug("Successfully fetched all projects");
             return ProjectResponse.builder().projects(ProjectDetails).build();
@@ -110,5 +122,35 @@ public class ProjectServiceImpl implements ProjectService {
             throw new EntityNotFoundException(ErrorCodeConstant.PROJECT_DOES_NOT_EXIST);
         }
         return projectOptional.get();
+    }
+
+    @Override
+    public ResponseMessage allocateProjectToStudents(Long id, ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest) {
+        Project project = getProject(id);
+        List<Student> students = studentService.getStudentsByIds(projectStudentAllocationDeAllocationRequest.getStudentIds());
+        for (Student student : students) {
+            Set<Project> projects = student.getProjects();
+            projects.add(project);
+            student.setProjects(projects);
+            project.getStudents().add(student);
+        }
+        studentService.updateStudents(students);
+        projectRepository.save(project);
+        return ResponseMessage.builder().message(ErrorCodeConstant.STUDENTS_ALLOCATED_TO_PROJECT_SUCCESSFULLY).build();
+    }
+
+    @Override
+    public ResponseMessage deallocateProjectToStudents(Long id, ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest) {
+        Project project = getProject(id);
+        List<Student> students = studentService.getStudentsByIds(projectStudentAllocationDeAllocationRequest.getStudentIds());
+        for (Student student : students) {
+            Set<Project> projects = student.getProjects();
+            projects.remove(project);
+            student.setProjects(projects);
+            project.getStudents().remove(student);
+        }
+        studentService.updateStudents(students);
+        projectRepository.save(project);
+        return ResponseMessage.builder().message(ErrorCodeConstant.STUDENTS_DE_ALLOCATED_TO_PROJECT_SUCCESSFULLY).build();
     }
 }

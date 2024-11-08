@@ -2,6 +2,7 @@ package in.gurujifoundation.service;
 
 import in.gurujifoundation.domain.Project;
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
+import in.gurujifoundation.request.ProjectStudentAllocationDeAllocationRequest;
 import in.gurujifoundation.response.ProjectDetails;
 import in.gurujifoundation.response.ProjectResponse;
 import in.gurujifoundation.response.ResponseMessage;
@@ -14,9 +15,13 @@ public interface ProjectService {
 
     ResponseMessage updateProject(CreateOrUpdateProjectRequest updateProjectRequest, Long id);
 
-    ProjectResponse getAllProjects();
+    ProjectResponse getAllProjects(Long schoolId);
 
     ResponseMessage deleteProject(Long id);
 
     Project getProject(Long id);
+
+    ResponseMessage allocateProjectToStudents(Long id, ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest);
+
+    ResponseMessage deallocateProjectToStudents(Long id, ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest);
 }

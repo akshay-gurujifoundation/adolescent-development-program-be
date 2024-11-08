@@ -7,6 +7,8 @@ import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -15,7 +17,7 @@ import java.time.LocalDate;
 @Builder
 @Audited
 @EntityListeners(AuditingEntityListener.class)
-@EqualsAndHashCode(callSuper = false, exclude = {"school"})
+@EqualsAndHashCode(callSuper = false, exclude = {"school", "students"})
 @ToString(exclude = {"school"})
 @Entity
 @Table(name = "project", indexes = @Index(name = "idx_school_id", columnList = "school_id"))
@@ -50,4 +52,8 @@ public class Project extends Auditable {
     @JoinColumn(name = "school_id", nullable = false, foreignKey = @ForeignKey(name = "fk_project_school_id"),
             referencedColumnName = "id")
     private School school;
+
+    @ManyToMany(mappedBy = "projects")
+    private Set<Student> students = new HashSet<>();
+
 }

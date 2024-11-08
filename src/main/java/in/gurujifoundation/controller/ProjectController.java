@@ -1,6 +1,7 @@
 package in.gurujifoundation.controller;
 
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
+import in.gurujifoundation.request.ProjectStudentAllocationDeAllocationRequest;
 import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -104,8 +105,8 @@ public class ProjectController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
     @GetMapping
-    public ResponseEntity<?> getAllProjects() {
-        ProjectResponse projectResponse = projectService.getAllProjects();
+    public ResponseEntity<?> getAllProjects(@RequestParam(value = "schoolId", required = false) Long schoolId) {
+        ProjectResponse projectResponse = projectService.getAllProjects(schoolId);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(projectResponse).build());
     }
 
@@ -127,4 +128,43 @@ public class ProjectController {
         ResponseMessage responseMessage = projectService.deleteProject(id);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
+
+    @Operation(
+            summary = "Allocate students to Project",
+            description = "Endpoint to allocate students to project",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Students allocated to project successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @PostMapping("/{id}/students/allocate")
+    public ResponseEntity<?> allocateProjectToStudents( @PathVariable Long id, @RequestBody ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest) {
+        ResponseMessage responseMessage = projectService.allocateProjectToStudents(id, projectStudentAllocationDeAllocationRequest);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
+    @Operation(
+            summary = "Allocate students to Project",
+            description = "Endpoint to allocate students to project",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Students de-allocated to project successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @PostMapping("/{id}/students/de-allocate")
+    public ResponseEntity<?> deallocateProjectToStudents( @PathVariable Long id, @RequestBody ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest) {
+        ResponseMessage responseMessage = projectService.deallocateProjectToStudents(id, projectStudentAllocationDeAllocationRequest);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
 }

@@ -4,6 +4,7 @@ import in.gurujifoundation.domain.Project;
 import in.gurujifoundation.domain.School;
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
 import in.gurujifoundation.response.ProjectDetails;
+import jakarta.persistence.Table;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -33,7 +34,8 @@ public interface ProjectMapper {
     @Mapping(target = "actualStartDate", source = "project.actualStartDate")
     @Mapping(target = "actualEndDate", source = "project.actualEndDate")
     @Mapping(target = "status", source = "project.status")
-    @Mapping(target = "schoolDetails", source = "project.school")
+    @Mapping(target = "school", source = "project.school")
+    @Mapping(target = "students", source = "students")
     ProjectDetails mapToProjectDetailsResponse(Project project);
 
     List<ProjectDetails> mapToProjectDetailsList(List<Project> projects);

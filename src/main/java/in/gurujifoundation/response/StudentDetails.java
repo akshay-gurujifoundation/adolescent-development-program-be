@@ -16,4 +16,5 @@ public class StudentDetails {
     private String alternativeNumber;
     private String email;
     private ParentDetails parent;
+    private SchoolDetails schoolDetails;
 }
