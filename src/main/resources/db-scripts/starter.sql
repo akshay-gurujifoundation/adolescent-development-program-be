@@ -228,7 +228,6 @@ CREATE TABLE project
     updated_by         VARCHAR(255)               NOT NULL,
     updated_at         TIMESTAMP                  NOT NULL
     CONSTRAINT fk_project_school_id FOREIGN KEY (school_id) REFERENCES school (id),
-    CONSTRAINT project_idx_school_id UNIQUE (school_id)
 );
 
 CREATE TABLE project_aud
