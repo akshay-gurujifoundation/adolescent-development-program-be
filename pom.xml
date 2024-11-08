@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>in.gurujifoundation</groupId>
 	<artifactId>Adolescent-Development-Program</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>Adolescent-Development-Program</name>
 	<description>holistically develop adolescents. The project is running at 5 different schools (Nerul, Thane, Osmanabad, Chikhurde (Sangli), Ramgad (Kankavli)) and focuses on physical literacy, psychological strength, intellectual sharpness, and entrepreneurial zeal as well as life skills. We had to switch to online mode in the last year. We are planning to build a traveling computing lab, initially for 6 villages in the Kankavli area, to teach software development using MIT US’s Scratch platform to develop creative, critical, and computational thinking. We are also establishing online classes for spoken English.</description>
 	<url/>
