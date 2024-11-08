@@ -223,6 +223,10 @@ CREATE TABLE project
     actual_end_date   DATE,
     status            VARCHAR(50),
     school_id         BIGINT       NOT NULL,
+    created_by         VARCHAR(255)               NOT NULL,
+    created_at         TIMESTAMP                  NOT NULL,
+    updated_by         VARCHAR(255)               NOT NULL,
+    updated_at         TIMESTAMP                  NOT NULL
     CONSTRAINT fk_project_school_id FOREIGN KEY (school_id) REFERENCES school (id),
     CONSTRAINT project_idx_school_id UNIQUE (school_id)
 );
@@ -240,7 +244,10 @@ CREATE TABLE project_aud
     actual_end_date   DATE,         -- Audited field 'actualEndDate'
     status            VARCHAR(50),  -- Audited field 'status'
     school_id         BIGINT,       -- Audited field 'school_id' (foreign key reference)
-
+    created_by         VARCHAR(255)               NOT NULL,
+    created_at         TIMESTAMP                  NOT NULL,
+    updated_by         VARCHAR(255)               NOT NULL,
+    updated_at         TIMESTAMP                  NOT NULL
     PRIMARY KEY (id, rev)           -- Composite primary key
 );
 
@@ -251,7 +258,10 @@ CREATE TABLE performance
     student_id       BIGINT NOT NULL,
     project_id       BIGINT NOT NULL,
     attendance_grade VARCHAR(10),
-
+    created_by         VARCHAR(255)               NOT NULL,
+    created_at         TIMESTAMP                  NOT NULL,
+    updated_by         VARCHAR(255)               NOT NULL,
+    updated_at         TIMESTAMP                  NOT NULL
     CONSTRAINT fk_performance_student_id FOREIGN KEY (student_id) REFERENCES student (id),
     CONSTRAINT fk_performance_project_id FOREIGN KEY (project_id) REFERENCES project (id)
 );
@@ -269,6 +279,10 @@ CREATE TABLE performance_aud
     student_id       BIGINT,      -- Audited field 'student_id' (foreign key reference)
     project_id       BIGINT,      -- Audited field 'project_id' (foreign key reference)
     attendance_grade VARCHAR(10), -- Audited field 'attendance_grade'
+    created_by         VARCHAR(255)               NOT NULL,
+    created_at         TIMESTAMP                  NOT NULL,
+    updated_by         VARCHAR(255)               NOT NULL,
+    updated_at         TIMESTAMP                  NOT NULL
 
     PRIMARY KEY (id, rev)         -- Composite primary key
 );

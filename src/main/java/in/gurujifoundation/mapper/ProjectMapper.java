@@ -24,6 +24,7 @@ public interface ProjectMapper {
     @Mapping(target = "actualEndDate", source = "createOrUpdateProjectRequest.actualEndDate")
     @Mapping(target = "status", source = "createOrUpdateProjectRequest.status")
     @Mapping(target = "school", source = "school")
+    @Mapping(target = "id", ignore = true)
     Project mapToEntity(CreateOrUpdateProjectRequest createOrUpdateProjectRequest, School school);
 
     @Mapping(target = "description", source = "project.description")
