@@ -37,7 +37,6 @@ SEQUENCES IN SCHEMA public TO adolescent_user;
 ALTER
 DATABASE adolescent_dev_program OWNER TO adolescent_user;
 
-
 -- Rev Info
 CREATE TABLE revinfo
 (
@@ -193,17 +192,17 @@ create index idx_student_school_id
 
 create table student_aud
 (
-    id                 INTEGER  NOT NULL,
-    rev                INTEGER  NOT NULL
+    id                 INTEGER      NOT NULL,
+    rev                INTEGER      NOT NULL
         references revinfo,
-    revtype            smallint NOT NULL,
-    school_id          INTEGER NULL,      -- Allow NULL for deletion
+    revtype            smallint     NOT NULL,
+    school_id          INTEGER      NULL, -- Allow NULL for deletion
     name               VARCHAR(255) NULL, -- Allow NULL for deletion
-    dob                DATE NULL,         -- Allow NULL for deletion
-    parent_id          INTEGER NULL,      -- Allow NULL for deletion
+    dob                DATE         NULL, -- Allow NULL for deletion
+    parent_id          INTEGER      NULL, -- Allow NULL for deletion
     address            VARCHAR(255) NULL, -- Allow NULL for deletion
-    phone_number       VARCHAR(15) NULL,  -- Allow NULL for deletion
-    alternative_number VARCHAR(15) NULL,
+    phone_number       VARCHAR(15)  NULL, -- Allow NULL for deletion
+    alternative_number VARCHAR(15)  NULL,
     email              VARCHAR(255) NULL, -- Allow NULL for deletion
     created_by         VARCHAR(255),
     created_at         TIMESTAMP,
@@ -226,8 +225,8 @@ CREATE TABLE project
     created_by        VARCHAR(255) NOT NULL,
     created_at        TIMESTAMP    NOT NULL,
     updated_by        VARCHAR(255) NOT NULL,
-    updated_at        TIMESTAMP    NOT NULL
-        CONSTRAINT fk_project_school_id FOREIGN KEY (school_id) REFERENCES school (id),
+    updated_at        TIMESTAMP    NOT NULL,
+    CONSTRAINT fk_project_school_id FOREIGN KEY (school_id) REFERENCES school (id)
 );
 
 CREATE TABLE project_aud
@@ -246,8 +245,8 @@ CREATE TABLE project_aud
     created_by        VARCHAR(255) NOT NULL,
     created_at        TIMESTAMP    NOT NULL,
     updated_by        VARCHAR(255) NOT NULL,
-    updated_at        TIMESTAMP    NOT NULL
-        PRIMARY KEY (id, rev)       -- Composite primary key
+    updated_at        TIMESTAMP    NOT NULL,
+    PRIMARY KEY (id, rev)           -- Composite primary key
 );
 
 
@@ -260,8 +259,8 @@ CREATE TABLE performance
     created_by       VARCHAR(255) NOT NULL,
     created_at       TIMESTAMP    NOT NULL,
     updated_by       VARCHAR(255) NOT NULL,
-    updated_at       TIMESTAMP    NOT NULL
-        CONSTRAINT fk_performance_student_id FOREIGN KEY (student_id) REFERENCES student (id),
+    updated_at       TIMESTAMP    NOT NULL,
+    CONSTRAINT fk_performance_student_id FOREIGN KEY (student_id) REFERENCES student (id),
     CONSTRAINT fk_performance_project_id FOREIGN KEY (project_id) REFERENCES project (id)
 );
 
@@ -281,8 +280,8 @@ CREATE TABLE performance_aud
     created_by       VARCHAR(255) NOT NULL,
     created_at       TIMESTAMP    NOT NULL,
     updated_by       VARCHAR(255) NOT NULL,
-    updated_at       TIMESTAMP    NOT NULL
-        PRIMARY KEY (id, rev)     -- Composite primary key
+    updated_at       TIMESTAMP    NOT NULL,
+    PRIMARY KEY (id, rev)         -- Composite primary key
 );
 
 CREATE TABLE student_project
