@@ -221,7 +221,6 @@ CREATE TABLE project
     actual_start_date DATE,
     actual_end_date   DATE,
     status            VARCHAR(50),
-    school_id         BIGINT       NOT NULL,
     created_by        VARCHAR(255) NOT NULL,
     created_at        TIMESTAMP    NOT NULL,
     updated_by        VARCHAR(255) NOT NULL,
@@ -241,7 +240,6 @@ CREATE TABLE project_aud
     actual_start_date DATE,         -- Audited field 'actualStartDate'
     actual_end_date   DATE,         -- Audited field 'actualEndDate'
     status            VARCHAR(50),  -- Audited field 'status'
-    school_id         BIGINT,       -- Audited field 'school_id' (foreign key reference)
     created_by        VARCHAR(255) NOT NULL,
     created_at        TIMESTAMP    NOT NULL,
     updated_by        VARCHAR(255) NOT NULL,
