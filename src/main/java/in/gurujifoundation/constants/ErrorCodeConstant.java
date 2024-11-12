@@ -27,5 +27,8 @@ public interface ErrorCodeConstant {
     String TOPIC_CREATED_SUCCESSFULLY = "Topic created successfully";
     String TOPIC_UPDATED_SUCCESSFULLY = "Topic updated successfully";
     String TOPIC_DELETED_SUCCESSFULLY = "Topic deleted successfully";
+    String PROJECT_COORDINATOR_CREATED_SUCCESSFULLY = "Project coordinator created successfully";
+    String PROJECT_COORDINATOR_UPDATED_SUCCESSFULLY = "Project coordinator updated successfully";
+    String PROJECT_COORDINATOR_DELETED_SUCCESSFULLY = "Project coordinator deleted successfully";
 
 }

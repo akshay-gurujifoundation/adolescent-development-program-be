@@ -161,7 +161,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
-    @PostMapping("/{id}/students/de-allocate")
+    @PostMapping("/{id}/students/deallocate")
     public ResponseEntity<?> deallocateProjectToStudents( @PathVariable Long id, @RequestBody ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest) {
         ResponseMessage responseMessage = projectService.deallocateProjectToStudents(id, projectStudentAllocationDeAllocationRequest);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());

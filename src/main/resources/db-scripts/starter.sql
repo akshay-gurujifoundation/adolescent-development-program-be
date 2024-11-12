@@ -350,3 +350,36 @@ CREATE TABLE school_project_aud
     rev        INT,     -- Revision number
     revtype    SMALLINT -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
 );
+
+
+
+CREATE TABLE project_coordinator
+(
+    id                SERIAL PRIMARY KEY,
+    name              VARCHAR(255) NOT NULL,
+    area_of_expertise VARCHAR(255),
+    availability      VARCHAR(255),
+    mobile_number     VARCHAR(15),
+    address           VARCHAR(255),
+    created_by        VARCHAR(255) NOT NULL,
+    created_at        TIMESTAMP    NOT NULL,
+    updated_by        VARCHAR(255) NOT NULL,
+    updated_at        TIMESTAMP    NOT NULL
+);
+
+
+CREATE TABLE project_coordinator_aud
+(
+    id                SERIAL,
+    name              VARCHAR(255),
+    area_of_expertise VARCHAR(255),
+    availability      VARCHAR(255),
+    mobile_number     VARCHAR(15),
+    address           VARCHAR(255),
+    created_by        VARCHAR(255),
+    created_at        TIMESTAMP,
+    updated_by        VARCHAR(255),
+    updated_at        TIMESTAMP,
+    rev               INT,     -- Revision number
+    revtype           SMALLINT -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
+);

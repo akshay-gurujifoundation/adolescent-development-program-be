@@ -10,7 +10,7 @@ public interface TeacherService {
 
     TeacherDetails getTeacherById(Long id);
 
-    TeacherResponse getAllTeachers();
+    TeacherResponse getAllTeachers(Long schoolId);
 
     ResponseMessage updateTeacher(CreateOrUpdateTeacherRequest updateTeacherRequest, Long id);
 

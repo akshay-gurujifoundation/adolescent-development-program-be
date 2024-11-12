@@ -63,10 +63,15 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public TeacherResponse getAllTeachers() {
+    public TeacherResponse getAllTeachers(Long schoolId) {
         try {
             log.debug("Started fetching all teachers");
-            List<Teacher> teacherList = teacherRepository.findAll();
+            List<Teacher> teacherList;
+            if(schoolId != null) {
+                teacherList = teacherRepository.findAllBySchoolId(schoolId);
+            } else {
+                teacherList = teacherRepository.findAll();
+            }
             List<TeacherDetails> teacherDetails = TeacherMapper.INSTANCE.mapToTeacherDetailsList(teacherList);
             log.debug("Successfully fetched all teachers");
             return TeacherResponse.builder().teacherDetails(teacherDetails).build();
