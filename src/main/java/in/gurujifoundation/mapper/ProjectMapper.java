@@ -24,9 +24,8 @@ public interface ProjectMapper {
     @Mapping(target = "actualStartDate", source = "createOrUpdateProjectRequest.actualStartDate")
     @Mapping(target = "actualEndDate", source = "createOrUpdateProjectRequest.actualEndDate")
     @Mapping(target = "status", source = "createOrUpdateProjectRequest.status")
-    @Mapping(target = "school", source = "school")
     @Mapping(target = "id", ignore = true)
-    Project mapToEntity(CreateOrUpdateProjectRequest createOrUpdateProjectRequest, School school);
+    Project mapToEntity(CreateOrUpdateProjectRequest createOrUpdateProjectRequest);
 
     @Mapping(target = "description", source = "project.description")
     @Mapping(target = "startDate", source = "project.startDate")
@@ -34,7 +33,7 @@ public interface ProjectMapper {
     @Mapping(target = "actualStartDate", source = "project.actualStartDate")
     @Mapping(target = "actualEndDate", source = "project.actualEndDate")
     @Mapping(target = "status", source = "project.status")
-    @Mapping(target = "school", source = "project.school")
+    @Mapping(target = "schools", source = "project.schools")
     @Mapping(target = "students", source = "students")
     ProjectDetails mapToProjectDetailsResponse(Project project);
 
@@ -48,6 +47,5 @@ public interface ProjectMapper {
     @Mapping(target = "actualStartDate", source = "createOrUpdateProjectRequest.actualStartDate")
     @Mapping(target = "actualEndDate", source = "createOrUpdateProjectRequest.actualEndDate")
     @Mapping(target = "status", source = "createOrUpdateProjectRequest.status")
-    @Mapping(target = "school", source = "school")
-    void updateProject(@MappingTarget Project project, CreateOrUpdateProjectRequest createOrUpdateProjectRequest, School school);
+    void updateProject(@MappingTarget Project project, CreateOrUpdateProjectRequest createOrUpdateProjectRequest);
 }

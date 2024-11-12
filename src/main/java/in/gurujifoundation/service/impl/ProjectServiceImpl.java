@@ -2,7 +2,6 @@ package in.gurujifoundation.service.impl;
 
 import in.gurujifoundation.constants.ErrorCodeConstant;
 import in.gurujifoundation.domain.Project;
-import in.gurujifoundation.domain.School;
 import in.gurujifoundation.domain.Student;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
@@ -25,14 +24,11 @@ import java.util.Set;
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
-    private final SchoolService schoolService;
-
     private final ProjectRepository projectRepository;
 
     private final StudentService studentService;
 
     public ProjectServiceImpl(SchoolService schoolService, ProjectRepository projectRepository, StudentService studentService) {
-        this.schoolService = schoolService;
         this.projectRepository = projectRepository;
         this.studentService = studentService;
     }
@@ -41,8 +37,7 @@ public class ProjectServiceImpl implements ProjectService {
     public ResponseMessage createProject(CreateOrUpdateProjectRequest createOrUpdateProjectRequest) {
         try {
             log.debug("Started saving project with name: {}", createOrUpdateProjectRequest.getName());
-            School school = schoolService.getSchool(createOrUpdateProjectRequest.getSchoolId());
-            Project project = ProjectMapper.INSTANCE.mapToEntity(createOrUpdateProjectRequest, school);
+            Project project = ProjectMapper.INSTANCE.mapToEntity(createOrUpdateProjectRequest);
             projectRepository.save(project);
             log.debug("Successfully saved project with name: {}", createOrUpdateProjectRequest.getName());
             return ResponseMessage.builder().message(ErrorCodeConstant.PROJECT_CREATED_SUCCESSFULLY).build();
@@ -69,9 +64,8 @@ public class ProjectServiceImpl implements ProjectService {
     public ResponseMessage updateProject(CreateOrUpdateProjectRequest updateProjectRequest, Long id) {
         try {
             log.debug("Started updating project with id: {}", id);
-            School school = schoolService.getSchool(updateProjectRequest.getSchoolId());
             Project Project = getProject(id);
-            ProjectMapper.INSTANCE.updateProject(Project, updateProjectRequest, school);
+            ProjectMapper.INSTANCE.updateProject(Project, updateProjectRequest);
             projectRepository.save(Project);
             log.debug("Successfully updated project with id: {}", id);
             return ResponseMessage.builder().message(ErrorCodeConstant.PROJECT_UPDATED_SUCCESSFULLY).build();
@@ -87,7 +81,7 @@ public class ProjectServiceImpl implements ProjectService {
             log.debug("Started fetching all projects");
             List<Project> projects;
             if (schoolId != null) {
-                projects = projectRepository.findAllBySchoolId(schoolId);
+                projects = projectRepository.findAllBySchools_Id(schoolId);
             } else {
                 projects = projectRepository.findAll();
             }
@@ -153,4 +147,10 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.save(project);
         return ResponseMessage.builder().message(ErrorCodeConstant.STUDENTS_DE_ALLOCATED_TO_PROJECT_SUCCESSFULLY).build();
     }
+
+    @Override
+    public void saveProject(Project project) {
+        projectRepository.save(project);
+    }
+
 }

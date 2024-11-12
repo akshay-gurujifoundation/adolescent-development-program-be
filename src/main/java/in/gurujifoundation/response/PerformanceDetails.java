@@ -8,6 +8,7 @@ import lombok.Data;
 public class PerformanceDetails {
     private Long id;
     private Long studentId;
-    private Long projectId;
-    private String attendanceGrade;
+    private Long topicId;
+    private Float beforeInterventionMark;
+    private Float afterInterventionMark;
 }

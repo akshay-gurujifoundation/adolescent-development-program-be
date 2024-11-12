@@ -13,5 +13,5 @@ public class CreateOrUpdateProjectRequest {
     private LocalDate actualStartDate;
     private LocalDate actualEndDate;
     private String status;
-    private Long schoolId;
+    private Long projectCoordinatorId;
 }

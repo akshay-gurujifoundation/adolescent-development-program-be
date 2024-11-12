@@ -19,6 +19,6 @@ public class ProjectDetails {
     private LocalDate actualStartDate;
     private LocalDate actualEndDate;
     private String status;
-    private SchoolDetails school;
+    private List<SchoolDetails> schools;
     List<StudentDetails> students;
 }

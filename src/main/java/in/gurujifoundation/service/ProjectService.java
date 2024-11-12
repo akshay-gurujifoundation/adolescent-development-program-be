@@ -24,4 +24,6 @@ public interface ProjectService {
     ResponseMessage allocateProjectToStudents(Long id, ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest);
 
     ResponseMessage deallocateProjectToStudents(Long id, ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest);
+
+    void saveProject(Project project);
 }

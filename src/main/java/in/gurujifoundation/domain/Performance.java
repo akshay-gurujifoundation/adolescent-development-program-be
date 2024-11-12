@@ -1,17 +1,22 @@
 package in.gurujifoundation.domain;
 
 
+import in.gurujifoundation.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.envers.Audited;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Audited
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "performance")
-public class Performance {
+public class Performance extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,14 +24,17 @@ public class Performance {
 
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false, foreignKey = @ForeignKey(name = "fk_performance_student_id"),
-                referencedColumnName = "id")
+            referencedColumnName = "id")
     private Student student;
 
-    @ManyToOne
-    @JoinColumn(name = "project_id", nullable = false, foreignKey = @ForeignKey(name = "fk_performance_project_id"),
-                referencedColumnName = "id")
-    private Project project;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_id", nullable = false, foreignKey = @ForeignKey(name = "fk_performance_topic_id"))
+    private Topic topic;
 
-    @Column(name = "attendance_grade", length = 10)
-    private String attendanceGrade;
+    @Column(name = "before_intervention_mark")
+    private Float beforeInterventionMark;
+
+    @Column(name = "after_intervention_mark")
+    private Float afterInterventionMark;
+
 }

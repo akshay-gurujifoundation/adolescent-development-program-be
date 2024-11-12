@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 @Transactional
 public interface ProjectRepository extends JpaRepository<Project, Long> {
-    List<Project> findAllBySchoolId(Long schoolId);
+    List<Project> findAllBySchools_Id(Long schoolId);
 }

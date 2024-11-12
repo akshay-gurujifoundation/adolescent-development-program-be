@@ -4,6 +4,7 @@ import in.gurujifoundation.constants.ErrorCodeConstant;
 import in.gurujifoundation.domain.Performance;
 import in.gurujifoundation.domain.Project;
 import in.gurujifoundation.domain.Student;
+import in.gurujifoundation.domain.Topic;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.PerformanceMapper;
@@ -15,7 +16,9 @@ import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.service.PerformanceService;
 import in.gurujifoundation.service.ProjectService;
 import in.gurujifoundation.service.StudentService;
+import in.gurujifoundation.service.TopicService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.token.TokenService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,14 +30,14 @@ public class PerformanceServiceImpl implements PerformanceService {
 
     private final StudentService studentService;
 
-    private final ProjectService projectService;
-
     private final PerformanceRepository performanceRepository;
 
-    public PerformanceServiceImpl(StudentService studentService, ProjectService projectService, PerformanceRepository performanceRepository) {
+    private final TopicService topicService;
+
+    public PerformanceServiceImpl(StudentService studentService, PerformanceRepository performanceRepository, TopicService topicService) {
         this.studentService = studentService;
-        this.projectService = projectService;
         this.performanceRepository = performanceRepository;
+        this.topicService = topicService;
     }
 
     @Override
@@ -42,8 +45,8 @@ public class PerformanceServiceImpl implements PerformanceService {
         try {
             log.debug("Started saving performance for student id : {}", createOrUpdatePerformanceRequest.getStudentId());
             Student student = studentService.getStudent(createOrUpdatePerformanceRequest.getStudentId());
-            Project project = projectService.getProject(createOrUpdatePerformanceRequest.getProjectId());
-            Performance performance = PerformanceMapper.INSTANCE.mapToEntity(createOrUpdatePerformanceRequest, student, project);
+            Topic topic = topicService.getTopic(createOrUpdatePerformanceRequest.getTopicId());
+            Performance performance = PerformanceMapper.INSTANCE.mapToEntity(createOrUpdatePerformanceRequest, student, topic);
             performanceRepository.save(performance);
             log.debug("Successfully saved performance for student id : {}", createOrUpdatePerformanceRequest.getStudentId());
             return ResponseMessage.builder().message(ErrorCodeConstant.PERFORMANCE_CREATED_SUCCESSFULLY).build();
@@ -71,9 +74,9 @@ public class PerformanceServiceImpl implements PerformanceService {
         try {
             log.debug("Started updating performance with id: {}", id);
             Student student = studentService.getStudent(createOrUpdatePerformanceRequest.getStudentId());
-            Project project = projectService.getProject(createOrUpdatePerformanceRequest.getProjectId());
+            Topic topic = topicService.getTopic(createOrUpdatePerformanceRequest.getTopicId());
             Performance Performance = getPerformance(id);
-            PerformanceMapper.INSTANCE.updatePerformance(Performance, createOrUpdatePerformanceRequest, student, project);
+            PerformanceMapper.INSTANCE.updatePerformance(Performance, createOrUpdatePerformanceRequest, student, topic);
             performanceRepository.save(Performance);
             log.debug("Successfully updated performance with id: {}", id);
             return ResponseMessage.builder().message(ErrorCodeConstant.PERFORMANCE_UPDATED_SUCCESSFULLY).build();

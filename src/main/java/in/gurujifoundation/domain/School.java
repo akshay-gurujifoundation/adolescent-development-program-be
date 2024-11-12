@@ -7,9 +7,11 @@ import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-@EqualsAndHashCode(callSuper = false, exclude = {"teachers"})
+@EqualsAndHashCode(callSuper = false, exclude = {"teachers", "projects"})
 @ToString(exclude = {"teachers"})
 @Entity
 @Table(name = "school")
@@ -56,4 +58,7 @@ public class School extends Auditable {
     @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Student> students = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "schools")
+    private Set<Project> projects = new HashSet<>();
 }

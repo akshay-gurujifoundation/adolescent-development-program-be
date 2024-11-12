@@ -24,4 +24,8 @@ public interface ErrorCodeConstant {
     String ID_CANT_BE_BLANK = "The ID can't be blank";
     String STUDENTS_ALLOCATED_TO_PROJECT_SUCCESSFULLY = "Students allocated to project successfully";
     String STUDENTS_DE_ALLOCATED_TO_PROJECT_SUCCESSFULLY = "Students de-allocated to project successfully";
+    String TOPIC_CREATED_SUCCESSFULLY = "Topic created successfully";
+    String TOPIC_UPDATED_SUCCESSFULLY = "Topic updated successfully";
+    String TOPIC_DELETED_SUCCESSFULLY = "Topic deleted successfully";
+
 }

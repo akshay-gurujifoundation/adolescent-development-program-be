@@ -192,17 +192,17 @@ create index idx_student_school_id
 
 create table student_aud
 (
-    id                 INTEGER      NOT NULL,
-    rev                INTEGER      NOT NULL
+    id                 INTEGER  NOT NULL,
+    rev                INTEGER  NOT NULL
         references revinfo,
-    revtype            smallint     NOT NULL,
-    school_id          INTEGER      NULL, -- Allow NULL for deletion
+    revtype            smallint NOT NULL,
+    school_id          INTEGER NULL,      -- Allow NULL for deletion
     name               VARCHAR(255) NULL, -- Allow NULL for deletion
-    dob                DATE         NULL, -- Allow NULL for deletion
-    parent_id          INTEGER      NULL, -- Allow NULL for deletion
+    dob                DATE NULL,         -- Allow NULL for deletion
+    parent_id          INTEGER NULL,      -- Allow NULL for deletion
     address            VARCHAR(255) NULL, -- Allow NULL for deletion
-    phone_number       VARCHAR(15)  NULL, -- Allow NULL for deletion
-    alternative_number VARCHAR(15)  NULL,
+    phone_number       VARCHAR(15) NULL,  -- Allow NULL for deletion
+    alternative_number VARCHAR(15) NULL,
     email              VARCHAR(255) NULL, -- Allow NULL for deletion
     created_by         VARCHAR(255),
     created_at         TIMESTAMP,
@@ -252,16 +252,17 @@ CREATE TABLE project_aud
 
 CREATE TABLE performance
 (
-    id               SERIAL PRIMARY KEY,
-    student_id       BIGINT       NOT NULL,
-    project_id       BIGINT       NOT NULL,
-    attendance_grade VARCHAR(10),
-    created_by       VARCHAR(255) NOT NULL,
-    created_at       TIMESTAMP    NOT NULL,
-    updated_by       VARCHAR(255) NOT NULL,
-    updated_at       TIMESTAMP    NOT NULL,
+    id                       SERIAL PRIMARY KEY,
+    student_id               INT,
+    topic_id                 INT,
+    before_intervention_mark FLOAT,
+    after_intervention_mark  FLOAT,
+    created_by               VARCHAR(255) NOT NULL,
+    created_at               TIMESTAMP    NOT NULL,
+    updated_by               VARCHAR(255) NOT NULL,
+    updated_at               TIMESTAMP    NOT NULL,
     CONSTRAINT fk_performance_student_id FOREIGN KEY (student_id) REFERENCES student (id),
-    CONSTRAINT fk_performance_project_id FOREIGN KEY (project_id) REFERENCES project (id)
+    CONSTRAINT fk_performance_project_id FOREIGN KEY (topic_id) REFERENCES topic (id)
 );
 
 -- Indexes to speed up queries on foreign key columns
@@ -271,17 +272,18 @@ CREATE INDEX idx_performance_project_id ON performance (project_id);
 
 CREATE TABLE performance_aud
 (
-    id               BIGINT,      -- ID of the Performance being audited
-    rev              INT,         -- Revision number
-    revtype          SMALLINT,    -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
-    student_id       BIGINT,      -- Audited field 'student_id' (foreign key reference)
-    project_id       BIGINT,      -- Audited field 'project_id' (foreign key reference)
-    attendance_grade VARCHAR(10), -- Audited field 'attendance_grade'
-    created_by       VARCHAR(255) NOT NULL,
-    created_at       TIMESTAMP    NOT NULL,
-    updated_by       VARCHAR(255) NOT NULL,
-    updated_at       TIMESTAMP    NOT NULL,
-    PRIMARY KEY (id, rev)         -- Composite primary key
+    id                       BIGINT,   -- ID of the Performance being audited
+    rev                      INT,      -- Revision number
+    revtype                  SMALLINT, -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
+    student_id               BIGINT,   -- Audited field 'student_id' (foreign key reference)
+    topic_id                 INT,
+    before_intervention_mark FLOAT,
+    after_intervention_mark  FLOAT,
+    created_by               VARCHAR(255),
+    created_at               TIMESTAMP,
+    updated_by               VARCHAR(255),
+    updated_at               TIMESTAMP,
+    PRIMARY KEY (id, rev)              -- Composite primary key
 );
 
 CREATE TABLE student_project
@@ -298,6 +300,52 @@ CREATE TABLE student_project_aud
 (
     id         BIGSERIAL,
     student_id BIGINT,
+    project_id BIGINT,
+    rev        INT,     -- Revision number
+    revtype    SMALLINT -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
+);
+
+
+CREATE TABLE topic
+(
+    id          SERIAL PRIMARY KEY,
+    project_id  INT REFERENCES Project (id) NOT NULL,
+    topic_name  VARCHAR(255)                NOT NULL,
+    description VARCHAR(255),
+    created_by  VARCHAR(255)                NOT NULL,
+    created_at  TIMESTAMP                   NOT NULL,
+    updated_by  VARCHAR(255)                NOT NULL,
+    updated_at  TIMESTAMP                   NOT NULL
+);
+
+CREATE TABLE topic_aud
+(
+    id          SERIAL,
+    project_id  INT,
+    topic_name  VARCHAR(255),
+    description VARCHAR(255),
+    created_by  VARCHAR(255),
+    created_at  TIMESTAMP,
+    updated_by  VARCHAR(255),
+    updated_at  TIMESTAMP,
+    rev         INT,     -- Revision number
+    revtype     SMALLINT -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
+);
+
+CREATE TABLE school_project
+(
+    school_id  BIGINT NOT NULL,
+    project_id BIGINT NOT NULL,
+    PRIMARY KEY (school_id, project_id),
+    FOREIGN KEY (school_id) REFERENCES school (id) ON DELETE CASCADE,
+    FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE
+);
+
+-- Create the audit table for student_project join table
+CREATE TABLE school_project_aud
+(
+    id         BIGSERIAL,
+    school_id  BIGINT,
     project_id BIGINT,
     rev        INT,     -- Revision number
     revtype    SMALLINT -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
