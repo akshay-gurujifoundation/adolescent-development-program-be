@@ -107,8 +107,8 @@ public class TopicController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
     @GetMapping
-    public ResponseEntity<?> getAllTopics() {
-        TopicResponse topicResponse = topicService.getAllTopics();
+    public ResponseEntity<?> getAllTopics(@RequestParam(value = "projectId", required = false) Long projectId) {
+        TopicResponse topicResponse = topicService.getAllTopics(projectId);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(topicResponse).build());
     }
 

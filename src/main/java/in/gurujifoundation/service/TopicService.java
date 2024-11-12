@@ -14,7 +14,7 @@ public interface TopicService {
 
     TopicDetails getTopicById(Long id);
 
-    TopicResponse getAllTopics();
+    TopicResponse getAllTopics(Long projectId);
 
     ResponseMessage deleteTopic(Long id);
 

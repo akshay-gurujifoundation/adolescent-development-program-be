@@ -67,10 +67,16 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public TopicResponse getAllTopics() {
+    public TopicResponse getAllTopics(Long projectId) {
         try {
+            log.debug("Started fetching all projects");
+            List<Topic> topics;
+            if (projectId != null) {
+                topics = topicRepository.findAllByProjectId(projectId);
+            } else {
+                topics = topicRepository.findAll();
+            }
             log.debug("Started fetching all topics");
-            List<Topic> topics = topicRepository.findAll();
             List<TopicDetails> topicDetails = TopicMapper.INSTANCE.mapToTopicDetailsList(topics);
             log.debug("Successfully fetched all topics");
             return TopicResponse.builder().topics(topicDetails).build();
