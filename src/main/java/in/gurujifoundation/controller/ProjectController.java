@@ -204,7 +204,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/{id}/school/unassign")
-    public ResponseEntity<?> assignProjectToStudents(@PathVariable Long id, @RequestBody ProjectAssignRequest projectAssignRequest) {
+    public ResponseEntity<?> unAssignProjectToStudents(@PathVariable Long id, @RequestBody ProjectAssignRequest projectAssignRequest) {
         ResponseMessage responseMessage = projectService.assignProjectToStudents(id, projectAssignRequest);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
