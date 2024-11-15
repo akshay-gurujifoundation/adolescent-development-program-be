@@ -1,8 +1,12 @@
 package in.gurujifoundation.controller;
 
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
+import in.gurujifoundation.request.ProjectAssignRequest;
 import in.gurujifoundation.request.ProjectStudentAllocationDeAllocationRequest;
-import in.gurujifoundation.response.*;
+import in.gurujifoundation.response.APIResponse;
+import in.gurujifoundation.response.ProjectDetails;
+import in.gurujifoundation.response.ProjectResponse;
+import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -143,7 +147,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/{id}/students/allocate")
-    public ResponseEntity<?> allocateProjectToStudents( @PathVariable Long id, @RequestBody ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest) {
+    public ResponseEntity<?> allocateProjectToStudents(@PathVariable Long id, @RequestBody ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest) {
         ResponseMessage responseMessage = projectService.allocateProjectToStudents(id, projectStudentAllocationDeAllocationRequest);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
@@ -162,8 +166,46 @@ public class ProjectController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/{id}/students/deallocate")
-    public ResponseEntity<?> deallocateProjectToStudents( @PathVariable Long id, @RequestBody ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest) {
+    public ResponseEntity<?> deallocateProjectToStudents(@PathVariable Long id, @RequestBody ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest) {
         ResponseMessage responseMessage = projectService.deallocateProjectToStudents(id, projectStudentAllocationDeAllocationRequest);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
+    @Operation(
+            summary = "Allocate students to Project",
+            description = "Endpoint to allocate students to project",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Students allocated to project successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @PostMapping("/{id}/school/assign")
+    public ResponseEntity<?> assignProjectToStudents(@PathVariable Long id, @RequestBody ProjectAssignRequest projectAssignRequest) {
+        ResponseMessage responseMessage = projectService.assignProjectToStudents(id, projectAssignRequest);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
+    @Operation(
+            summary = "Allocate students to Project",
+            description = "Endpoint to allocate students to project",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Students allocated to project successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @PostMapping("/{id}/school/unassign")
+    public ResponseEntity<?> assignProjectToStudents(@PathVariable Long id, @RequestBody ProjectAssignRequest projectAssignRequest) {
+        ResponseMessage responseMessage = projectService.assignProjectToStudents(id, projectAssignRequest);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
 

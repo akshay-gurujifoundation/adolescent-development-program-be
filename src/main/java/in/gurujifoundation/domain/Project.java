@@ -4,6 +4,7 @@ import in.gurujifoundation.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
@@ -64,5 +65,9 @@ public class Project extends Auditable {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private Set<Topic> topics = new HashSet<>();
+
+    @NotAudited
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<SchoolProjectMapping> schoolProjects = new HashSet<>();
 
 }

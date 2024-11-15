@@ -1,5 +1,6 @@
 package in.gurujifoundation.service;
 
+import in.gurujifoundation.domain.Teacher;
 import in.gurujifoundation.request.CreateOrUpdateTeacherRequest;
 import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.response.TeacherDetails;
@@ -15,4 +16,6 @@ public interface TeacherService {
     ResponseMessage updateTeacher(CreateOrUpdateTeacherRequest updateTeacherRequest, Long id);
 
     ResponseMessage deleteTeacher(Long id);
+
+    Teacher getTeacher(Long teacherId);
 }

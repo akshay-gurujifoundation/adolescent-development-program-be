@@ -110,7 +110,8 @@ public class TeacherServiceImpl implements TeacherService {
         }
     }
 
-    private Teacher getTeacher(Long id) {
+    @Override
+    public Teacher getTeacher(Long id) {
         log.debug("Starting to fetch teacher details for id: {}", id);
         Optional<Teacher> teacherOptional = teacherRepository.findById(id);
         if (teacherOptional.isEmpty()) {

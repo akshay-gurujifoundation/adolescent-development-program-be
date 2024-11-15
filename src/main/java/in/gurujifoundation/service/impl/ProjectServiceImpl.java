@@ -2,17 +2,20 @@ package in.gurujifoundation.service.impl;
 
 import in.gurujifoundation.constants.ErrorCodeConstant;
 import in.gurujifoundation.domain.Project;
+import in.gurujifoundation.domain.School;
 import in.gurujifoundation.domain.Student;
+import in.gurujifoundation.domain.Teacher;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.ProjectMapper;
 import in.gurujifoundation.repository.ProjectRepository;
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
+import in.gurujifoundation.request.ProjectAssignRequest;
 import in.gurujifoundation.request.ProjectStudentAllocationDeAllocationRequest;
-import in.gurujifoundation.response.*;
-import in.gurujifoundation.service.ProjectService;
-import in.gurujifoundation.service.SchoolService;
-import in.gurujifoundation.service.StudentService;
+import in.gurujifoundation.response.ProjectDetails;
+import in.gurujifoundation.response.ProjectResponse;
+import in.gurujifoundation.response.ResponseMessage;
+import in.gurujifoundation.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +31,18 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final StudentService studentService;
 
-    public ProjectServiceImpl(SchoolService schoolService, ProjectRepository projectRepository, StudentService studentService) {
+    private final SchoolService schoolService;
+
+    private final TeacherService teacherService;
+
+    private final SchoolProjectMappingService schoolProjectMappingService;
+
+    public ProjectServiceImpl(SchoolService schoolService, ProjectRepository projectRepository, StudentService studentService, SchoolService schoolService1, TeacherService teacherService, SchoolProjectMappingService schoolProjectMappingService) {
         this.projectRepository = projectRepository;
         this.studentService = studentService;
+        this.schoolService = schoolService;
+        this.teacherService = teacherService;
+        this.schoolProjectMappingService = schoolProjectMappingService;
     }
 
     @Override
@@ -151,6 +163,21 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void saveProject(Project project) {
         projectRepository.save(project);
+    }
+
+    @Override
+    public ResponseMessage assignProjectToStudents(Long id, ProjectAssignRequest projectAssignRequest) {
+        try {
+            Project project = getProject(id);
+            School school = schoolService.getSchool(projectAssignRequest.getSchoolId());
+            Teacher teacher = teacherService.getTeacher(projectAssignRequest.getTeacherId());
+            List<Student> studentList = studentService.getStudentsByIds(projectAssignRequest.getStudentIds());
+            schoolProjectMappingService.saveSchoolProjectMapping(project, school, teacher, studentList);
+            return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_ASSIGNED_SCHOOL_TEACHER_AND_STUDENTS_TO_PROJECT).build();
+        } catch (Exception e) {
+            log.error("Error occurred while assigning school, teacher and students to project with id: {}", id, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
     }
 
 }
