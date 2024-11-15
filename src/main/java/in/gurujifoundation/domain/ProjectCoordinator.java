@@ -10,6 +10,9 @@ import lombok.Setter;
 import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -39,5 +42,9 @@ public class ProjectCoordinator extends Auditable {
 
     @Column(name = "address")
     private String address;
+
+    @ManyToMany(mappedBy = "projectCoordinators")
+    private Set<Project> projects = new HashSet<>();
+
 
 }

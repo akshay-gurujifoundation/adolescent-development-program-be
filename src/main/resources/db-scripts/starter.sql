@@ -381,3 +381,26 @@ CREATE TABLE project_coordinator_aud
     rev               INT,     -- Revision number
     revtype           SMALLINT -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
 );
+
+
+CREATE TABLE project_project_coordinator
+(
+    project_id     BIGINT NOT NULL,
+    coordinator_id BIGINT NOT NULL,
+    PRIMARY KEY (project_id, coordinator_id),
+    CONSTRAINT fk_project FOREIGN KEY (project_id)
+        REFERENCES project (id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_project_coordinator FOREIGN KEY (coordinator_id)
+        REFERENCES project_coordinator (id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE project_project_coordinator_aud
+(
+    rev            INT,                           -- Envers revision number
+    revtype        SMALLINT,                      -- Type of revision (add, mod, del)
+    project_id     BIGINT,                        -- Reference to project_id in join table
+    coordinator_id BIGINT,                        -- Reference to coordinator_id in join table
+    PRIMARY KEY (rev, project_id, coordinator_id) -- Composite primary key
+);

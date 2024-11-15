@@ -16,8 +16,10 @@ import in.gurujifoundation.service.ProjectCoordinatorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -91,5 +93,16 @@ public class ProjectCoordinatorServiceImpl implements ProjectCoordinatorService 
             throw new EntityNotFoundException("ProjectCoordinator with id " + id + " not found");
         }
         return projectCoordinatorOptional.get();
+    }
+
+    @Override
+    public Set<ProjectCoordinator> getProjectCoordinators(List<Long> projectCoordinatorIds) {
+        List<ProjectCoordinator> projectCoordinators = projectCoordinatorRepository.findAllById(projectCoordinatorIds);
+        return new HashSet<>(projectCoordinators);
+    }
+
+    @Override
+    public void saveProjectCoordinators(Set<ProjectCoordinator> projectCoordinators) {
+        projectCoordinatorRepository.saveAll(projectCoordinators);
     }
 }

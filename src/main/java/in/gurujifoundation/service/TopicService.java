@@ -7,6 +7,9 @@ import in.gurujifoundation.response.TopicDetails;
 import in.gurujifoundation.response.TopicResponse;
 import jakarta.validation.Valid;
 
+import java.util.List;
+import java.util.Set;
+
 public interface TopicService {
     ResponseMessage createTopic(@Valid CreateOrUpdateTopicRequest createOrUpdateTopicRequest);
 
@@ -19,4 +22,6 @@ public interface TopicService {
     ResponseMessage deleteTopic(Long id);
 
     Topic getTopic(Long id);
+
+    void saveTopics(Set<Topic> topics);
 }

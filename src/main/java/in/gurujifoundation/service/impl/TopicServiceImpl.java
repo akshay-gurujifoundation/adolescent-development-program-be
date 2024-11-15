@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -105,5 +106,10 @@ public class TopicServiceImpl implements TopicService {
             throw new EntityNotFoundException("Topic with id " + id + " not found");
         }
         return topicOptional.get();
+    }
+
+    @Override
+    public void saveTopics(Set<Topic> topics) {
+        topicRepository.saveAll(topics);
     }
 }
