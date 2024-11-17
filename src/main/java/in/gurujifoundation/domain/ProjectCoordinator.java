@@ -3,10 +3,7 @@ package in.gurujifoundation.domain;
 
 import in.gurujifoundation.audit.Auditable;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -19,6 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Audited
+@EqualsAndHashCode(exclude = {"projects"}, callSuper = false)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "project_coordinator")
 public class ProjectCoordinator extends Auditable {

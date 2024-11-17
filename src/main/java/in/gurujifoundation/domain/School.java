@@ -59,6 +59,4 @@ public class School extends Auditable {
     @Builder.Default
     private List<Student> students = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "schools")
-    private Set<Project> projects = new HashSet<>();
 }

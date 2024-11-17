@@ -9,7 +9,6 @@ import in.gurujifoundation.mapper.TopicMapper;
 import in.gurujifoundation.repository.ProjectRepository;
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
 import in.gurujifoundation.request.ProjectAssignRequest;
-import in.gurujifoundation.request.ProjectStudentAllocationDeAllocationRequest;
 import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -112,7 +111,7 @@ public class ProjectServiceImpl implements ProjectService {
             log.debug("Started fetching all projects");
             List<Project> projects;
             if (schoolId != null) {
-                projects = projectRepository.findAllBySchools_Id(schoolId);
+                projects = projectRepository.findAllBySchoolId(schoolId);
             } else {
                 projects = projectRepository.findAll();
             }
@@ -149,35 +148,6 @@ public class ProjectServiceImpl implements ProjectService {
         return projectOptional.get();
     }
 
-    @Override
-    public ResponseMessage allocateProjectToStudents(Long id, ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest) {
-        Project project = getProject(id);
-        List<Student> students = studentService.getStudentsByIds(projectStudentAllocationDeAllocationRequest.getStudentIds());
-        for (Student student : students) {
-            Set<Project> projects = student.getProjects();
-            projects.add(project);
-            student.setProjects(projects);
-            project.getStudents().add(student);
-        }
-        studentService.updateStudents(students);
-        projectRepository.save(project);
-        return ResponseMessage.builder().message(ErrorCodeConstant.STUDENTS_ALLOCATED_TO_PROJECT_SUCCESSFULLY).build();
-    }
-
-    @Override
-    public ResponseMessage deallocateProjectToStudents(Long id, ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest) {
-        Project project = getProject(id);
-        List<Student> students = studentService.getStudentsByIds(projectStudentAllocationDeAllocationRequest.getStudentIds());
-        for (Student student : students) {
-            Set<Project> projects = student.getProjects();
-            projects.remove(project);
-            student.setProjects(projects);
-            project.getStudents().remove(student);
-        }
-        studentService.updateStudents(students);
-        projectRepository.save(project);
-        return ResponseMessage.builder().message(ErrorCodeConstant.STUDENTS_DE_ALLOCATED_TO_PROJECT_SUCCESSFULLY).build();
-    }
 
     @Override
     public void saveProject(Project project) {
@@ -203,7 +173,7 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectSchoolMappingResponse getProjectSchoolMapping(Long SchoolId) {
         try {
             List<SchoolProjectMappingDetails> schoolProjectMappingDetails = schoolProjectMappingService.getAllSchoolProjectMappings(SchoolId);
-            return ProjectSchoolMappingResponse.builder().schoolProjectMappings(schoolProjectMappingDetails).build();
+            return ProjectSchoolMappingResponse.builder().schoolProjects(schoolProjectMappingDetails).build();
         } catch (Exception e) {
             log.error("Error occurred while fetching associated project to school for id: {}", SchoolId, e);
             throw new InternalServerException("Unexpected error occurred");

@@ -131,25 +131,4 @@ public class StudentController {
         ResponseMessage responseMessage = studentService.deleteStudent(id);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
-
-    @Operation(
-            summary = "Get all students",
-            description = "Endpoint to retrieve student records",
-            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "students retrieved successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentsResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
-    })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/projects")
-    public ResponseEntity<?> getUnassignedStudentToProject(@RequestParam(value = "schoolId") Long schoolId,
-                                                           @RequestParam(value = "projectId") Long projectId) {
-        StudentsResponse studentsResponse = studentService.getUnassignedStudentToProject(schoolId, projectId);
-        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(studentsResponse).build());
-    }
 }

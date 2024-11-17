@@ -14,14 +14,4 @@ import java.util.List;
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
     List<Student> findAllBySchoolId(Long schoolId);
-
-    @Query("SELECT s FROM Student s " +
-            "JOIN s.school sc " +
-            "LEFT JOIN s.projects p " +
-            "WHERE sc.id = :schoolId " +
-            "AND (p.id IS NULL OR p.id != :projectId)")
-    List<Student> findAllBySchoolIdAndExcludeProject(@Param("schoolId") Long schoolId,
-                                                     @Param("projectId") Long projectId);
-
-
 }

@@ -3,6 +3,7 @@ package in.gurujifoundation.response;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -19,6 +20,6 @@ public class ProjectDetails {
     private LocalDate actualStartDate;
     private LocalDate actualEndDate;
     private String status;
-    private List<SchoolDetails> schools;
-    List<StudentDetails> students;
+    private List<TopicDetails> topics = new ArrayList<>();
+//    private List<SchoolProjectMappingDetails> schoolProjects = new ArrayList<>();
 }

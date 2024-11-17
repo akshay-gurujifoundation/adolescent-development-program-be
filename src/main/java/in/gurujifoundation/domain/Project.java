@@ -18,7 +18,7 @@ import java.util.Set;
 @Builder
 @Audited
 @EntityListeners(AuditingEntityListener.class)
-@EqualsAndHashCode(callSuper = false, exclude = {"schools", "students", "projectCoordinators", "topics", "schoolProjects"})
+@EqualsAndHashCode(callSuper = false, exclude = {"projectCoordinators", "topics", "schoolProjects"})
 @ToString()
 @Entity
 @Table(name = "project", indexes = @Index(name = "idx_school_id", columnList = "school_id"))
@@ -57,19 +57,6 @@ public class Project extends Auditable {
 
     @Column(length = 50)
     private String status;
-
-    @ManyToMany
-    @JoinTable(
-            name = "school_project",
-            joinColumns = @JoinColumn(name = "project_id", foreignKey = @ForeignKey(name = "fk_school_project_project_id")),
-            inverseJoinColumns = @JoinColumn(name = "school_id", foreignKey = @ForeignKey(name = "fk_school_project_school_id"))
-    )
-    @Builder.Default
-    private Set<School> schools = new HashSet<>();
-
-    @ManyToMany(mappedBy = "projects")
-    @Builder.Default
-    private Set<Student> students = new HashSet<>();
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default

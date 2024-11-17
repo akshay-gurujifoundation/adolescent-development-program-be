@@ -18,7 +18,7 @@ import java.util.List;
 @Audited
 @EntityListeners(AuditingEntityListener.class)
 @Builder
-@EqualsAndHashCode(callSuper = false, exclude = {"performances"})
+@EqualsAndHashCode(callSuper = false, exclude = {"performances", "project"})
 public class Topic extends Auditable {
 
     @Id

@@ -12,6 +12,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(callSuper = false, exclude = {"students"})
 @Table(name = "school_project_mapping")
 public class SchoolProjectMapping {
 

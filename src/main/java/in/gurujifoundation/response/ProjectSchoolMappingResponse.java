@@ -22,6 +22,6 @@ public class ProjectSchoolMappingResponse {
     @NotNull
     @NotEmpty
     @Builder.Default
-    private List<SchoolProjectMappingDetails> schoolProjectMappings = new ArrayList<>();
+    private List<SchoolProjectMappingDetails> schoolProjects = new ArrayList<>();
 
 }

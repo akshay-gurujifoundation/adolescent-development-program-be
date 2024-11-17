@@ -53,14 +53,4 @@ public class Student extends Auditable {
     @Column(name = "email", nullable = false)
     private String email;
 
-
-    @ManyToMany
-    @JoinTable(
-            name = "student_project",
-            joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "project_id")
-    )
-    @Builder.Default
-    private Set<Project> projects = new HashSet<>();
-
 }

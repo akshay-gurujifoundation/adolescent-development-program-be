@@ -22,10 +22,6 @@ public interface ProjectService {
 
     Project getProject(Long id);
 
-    ResponseMessage allocateProjectToStudents(Long id, ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest);
-
-    ResponseMessage deallocateProjectToStudents(Long id, ProjectStudentAllocationDeAllocationRequest projectStudentAllocationDeAllocationRequest);
-
     void saveProject(Project project);
 
     ResponseMessage assignProjectToSchool(Long id, ProjectAssignRequest projectAssignRequest);

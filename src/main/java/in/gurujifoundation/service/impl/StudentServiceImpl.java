@@ -130,16 +130,4 @@ public class StudentServiceImpl implements StudentService {
     public void updateStudents(List<Student> students) {
         studentRepository.saveAll(students);
     }
-
-    @Override
-    public StudentsResponse getUnassignedStudentToProject(Long schoolId, Long projectId) {
-        try {
-            List<Student> students = studentRepository.findAllBySchoolIdAndExcludeProject(schoolId, projectId);
-            List<StudentDetails> studentDetails = StudentMapper.INSTANCE.toStudentsDetails(students);
-            return StudentsResponse.builder().students(studentDetails).build();
-        } catch (Exception e) {
-            log.error("Error occurred while fetching students from db ", e);
-            throw new InternalServerException("Unexpected error occurred");
-        }
-    }
 }
