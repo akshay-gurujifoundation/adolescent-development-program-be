@@ -4,11 +4,13 @@ import in.gurujifoundation.domain.*;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.SchoolProjectMappingMapper;
 import in.gurujifoundation.repository.SchoolProjectMappingRepository;
+import in.gurujifoundation.response.SchoolProjectMappingDetails;
 import in.gurujifoundation.service.SchoolProjectMappingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,5 +33,18 @@ public class SchoolProjectMappingServiceImpl implements SchoolProjectMappingServ
             log.error("Error occurred while assigning school, teacher and students to project with id: {}", project.getId(), e);
             throw new InternalServerException("Unexpected error occurred");
         }
+    }
+
+    @Override
+    public List<SchoolProjectMappingDetails> getAllSchoolProjectMappings(Long schoolId) {
+        List<SchoolProjectMapping> schoolProjectMappings = new ArrayList<>();
+        if (schoolId == null) {
+            schoolProjectMappings = schoolProjectMappingRepository.findAll();
+
+        } else {
+            schoolProjectMappings = schoolProjectMappingRepository.findBySchoolId(schoolId);
+        }
+        return SchoolProjectMappingMapper.INSTANCE.mapToSchoolProjectMappingDerailsList(schoolProjectMappings);
+
     }
 }

@@ -3,10 +3,7 @@ package in.gurujifoundation.controller;
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
 import in.gurujifoundation.request.ProjectAssignRequest;
 import in.gurujifoundation.request.ProjectStudentAllocationDeAllocationRequest;
-import in.gurujifoundation.response.APIResponse;
-import in.gurujifoundation.response.ProjectDetails;
-import in.gurujifoundation.response.ProjectResponse;
-import in.gurujifoundation.response.ResponseMessage;
+import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -186,8 +183,27 @@ public class ProjectController {
     })
     @PostMapping("/{id}/school/assign")
     public ResponseEntity<?> assignProjectToStudents(@PathVariable Long id, @RequestBody ProjectAssignRequest projectAssignRequest) {
-        ResponseMessage responseMessage = projectService.assignProjectToStudents(id, projectAssignRequest);
+        ResponseMessage responseMessage = projectService.assignProjectToSchool(id, projectAssignRequest);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
+    @Operation(
+            summary = "Get Project school mapping by school Id",
+            description = "Endpoint to get project school mapping by school Id\"t",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retrieve project mapping successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @GetMapping("/school")
+    public ResponseEntity<?> getProjectSchoolMapping(@RequestParam Long schoolId) {
+        ProjectSchoolMappingResponse projectSchoolMapping = projectService.getProjectSchoolMapping(schoolId);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(projectSchoolMapping).build());
     }
 
     @Operation(
@@ -205,7 +221,7 @@ public class ProjectController {
     })
     @PostMapping("/{id}/school/unassign")
     public ResponseEntity<?> unAssignProjectToStudents(@PathVariable Long id, @RequestBody ProjectAssignRequest projectAssignRequest) {
-        ResponseMessage responseMessage = projectService.assignProjectToStudents(id, projectAssignRequest);
+        ResponseMessage responseMessage = projectService.assignProjectToSchool(id, projectAssignRequest);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
 

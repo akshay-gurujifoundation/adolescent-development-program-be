@@ -1,11 +1,9 @@
 package in.gurujifoundation.mapper;
 
 import in.gurujifoundation.domain.*;
-import in.gurujifoundation.request.CreateOrUpdateProjectCoordinatorRequest;
-import in.gurujifoundation.response.ProjectCoordinatorDetails;
+import in.gurujifoundation.response.SchoolProjectMappingDetails;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -21,4 +19,12 @@ public interface SchoolProjectMappingMapper {
     @Mapping(target = "teacher", source = "teacher")
     @Mapping(target = "students", source = "students")
     SchoolProjectMapping mapToEntity(Project project, School school, Teacher teacher, List<Student> students);
+
+    @Mapping(target = "project", source = "schoolProjectMapping.project")
+    @Mapping(target = "school", source = "schoolProjectMapping.school")
+    @Mapping(target = "teacher", source = "schoolProjectMapping.teacher")
+    @Mapping(target = "students", source = "schoolProjectMapping.students")
+    SchoolProjectMappingDetails mapToSchoolProjectMappingDetails(SchoolProjectMapping schoolProjectMapping);
+
+    List<SchoolProjectMappingDetails> mapToSchoolProjectMappingDerailsList(List<SchoolProjectMapping> schoolProjectMappings);
 }

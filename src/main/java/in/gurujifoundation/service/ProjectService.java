@@ -4,10 +4,10 @@ import in.gurujifoundation.domain.Project;
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
 import in.gurujifoundation.request.ProjectAssignRequest;
 import in.gurujifoundation.request.ProjectStudentAllocationDeAllocationRequest;
+import in.gurujifoundation.response.ProjectSchoolMappingResponse;
 import in.gurujifoundation.response.ProjectDetails;
 import in.gurujifoundation.response.ProjectResponse;
 import in.gurujifoundation.response.ResponseMessage;
-import jakarta.validation.Valid;
 
 public interface ProjectService {
     ResponseMessage createProject(CreateOrUpdateProjectRequest createOrUpdateProjectRequest);
@@ -28,5 +28,7 @@ public interface ProjectService {
 
     void saveProject(Project project);
 
-    ResponseMessage assignProjectToStudents(Long id, ProjectAssignRequest projectAssignRequest);
+    ResponseMessage assignProjectToSchool(Long id, ProjectAssignRequest projectAssignRequest);
+
+    ProjectSchoolMappingResponse getProjectSchoolMapping(Long SchoolId);
 }
