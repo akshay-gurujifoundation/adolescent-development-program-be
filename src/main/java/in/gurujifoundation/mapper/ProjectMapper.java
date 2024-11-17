@@ -19,10 +19,6 @@ public interface ProjectMapper {
 
     @Mapping(target = "name", source = "createOrUpdateProjectRequest.name")
     @Mapping(target = "description", source = "createOrUpdateProjectRequest.description")
-    @Mapping(target = "startDate", source = "createOrUpdateProjectRequest.startDate")
-    @Mapping(target = "endDate", source = "createOrUpdateProjectRequest.endDate")
-    @Mapping(target = "actualStartDate", source = "createOrUpdateProjectRequest.actualStartDate")
-    @Mapping(target = "actualEndDate", source = "createOrUpdateProjectRequest.actualEndDate")
     @Mapping(target = "status", source = "createOrUpdateProjectRequest.status")
     @Mapping(target = "projectCoordinators", source = "projectCoordinators")
     @Mapping(target = "id", ignore = true)
@@ -43,10 +39,6 @@ public interface ProjectMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "name", source = "createOrUpdateProjectRequest.name")
     @Mapping(target = "description", source = "createOrUpdateProjectRequest.description")
-    @Mapping(target = "startDate", source = "createOrUpdateProjectRequest.startDate")
-    @Mapping(target = "endDate", source = "createOrUpdateProjectRequest.endDate")
-    @Mapping(target = "actualStartDate", source = "createOrUpdateProjectRequest.actualStartDate")
-    @Mapping(target = "actualEndDate", source = "createOrUpdateProjectRequest.actualEndDate")
     @Mapping(target = "status", source = "createOrUpdateProjectRequest.status")
     void updateProject(@MappingTarget Project project, CreateOrUpdateProjectRequest createOrUpdateProjectRequest);
 }

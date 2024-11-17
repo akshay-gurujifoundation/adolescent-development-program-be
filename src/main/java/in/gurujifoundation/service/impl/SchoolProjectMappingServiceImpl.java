@@ -5,9 +5,9 @@ import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.SchoolProjectMappingMapper;
 import in.gurujifoundation.repository.SchoolProjectMappingRepository;
+import in.gurujifoundation.request.ProjectAssignRequest;
 import in.gurujifoundation.response.SchoolProjectMappingDetails;
 import in.gurujifoundation.service.SchoolProjectMappingService;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,9 +28,9 @@ public class SchoolProjectMappingServiceImpl implements SchoolProjectMappingServ
     }
 
     @Override
-    public void saveSchoolProjectMapping(Project project, School school, Teacher teacher, List<Student> studentList) {
+    public void saveSchoolProjectMapping(Project project, School school, Teacher teacher, List<Student> studentList, ProjectAssignRequest projectAssignRequest) {
         try {
-            SchoolProjectMapping schoolProjectMapping = SchoolProjectMappingMapper.INSTANCE.mapToEntity(project, school, teacher, studentList);
+            SchoolProjectMapping schoolProjectMapping = SchoolProjectMappingMapper.INSTANCE.mapToEntity(project, school, teacher, studentList, projectAssignRequest);
             schoolProjectMappingRepository.save(schoolProjectMapping);
         } catch (Exception e) {
             log.error("Error occurred while assigning school, teacher and students to project with id: {}", project.getId(), e);

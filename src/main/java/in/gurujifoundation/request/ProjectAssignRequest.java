@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 @Getter
@@ -19,6 +20,14 @@ public class ProjectAssignRequest {
     @Schema(description = "School to be assigned to project", example = "1")
     @NotEmpty(message = ErrorCodeConstant.SCHOOL_ID_CAN_NOT_BE_NULL_OR_BLANK)
     private Long schoolId;
+
+    private LocalDate startDate;
+
+    private LocalDate endDate;
+
+    private LocalDate actualStartDate;
+
+    private LocalDate actualEndDate;
 
     @Schema(description = "Teacher to be assigned to project", example = "1")
     @NotEmpty(message = ErrorCodeConstant.TEACHER_ID_CAN_NOT_BE_NULL_OR_BLANK)

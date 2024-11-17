@@ -14,10 +14,6 @@ import java.util.Set;
 public class CreateOrUpdateProjectRequest {
     private String name;
     private String description;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private LocalDate actualStartDate;
-    private LocalDate actualEndDate;
     private String status;
     private List<Long> projectCoordinatorIds;
     @Builder.Default

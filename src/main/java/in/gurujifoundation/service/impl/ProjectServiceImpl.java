@@ -165,7 +165,7 @@ public class ProjectServiceImpl implements ProjectService {
             School school = schoolService.getSchool(projectAssignRequest.getSchoolId());
             Teacher teacher = teacherService.getTeacher(projectAssignRequest.getTeacherId());
             List<Student> studentList = studentService.getStudentsByIds(projectAssignRequest.getStudentIds());
-            schoolProjectMappingService.saveSchoolProjectMapping(project, school, teacher, studentList);
+            schoolProjectMappingService.saveSchoolProjectMapping(project, school, teacher, studentList, projectAssignRequest);
             return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_ASSIGNED_SCHOOL_TEACHER_AND_STUDENTS_TO_PROJECT).build();
         } catch (Exception e) {
             log.error("Error occurred while assigning school, teacher and students to project with id: {}", id, e);

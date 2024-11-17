@@ -404,3 +404,10 @@ CREATE TABLE project_project_coordinator_aud
     coordinator_id BIGINT,                        -- Reference to coordinator_id in join table
     PRIMARY KEY (rev, project_id, coordinator_id) -- Composite primary key
 );
+
+ALTER table school_project_mapping
+    ADD COLUMN start_date DATE,
+ADD COLUMN end_date DATE,
+ADD COLUMN actual_start_date DATE,
+ADD COLUMN actual_end_date DATE;
+
