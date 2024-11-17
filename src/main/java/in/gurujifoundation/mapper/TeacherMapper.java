@@ -16,6 +16,7 @@ public interface TeacherMapper {
 
     TeacherMapper INSTANCE = Mappers.getMapper(TeacherMapper.class);
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "name", source = "createTeacherRequest.name")
     @Mapping(target = "experience", source = "createTeacherRequest.experience")
     @Mapping(target = "school", source = "school")
