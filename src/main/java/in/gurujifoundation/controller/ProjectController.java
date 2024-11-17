@@ -129,8 +129,8 @@ public class ProjectController {
     }
 
     @Operation(
-            summary = "Allocate students to Project",
-            description = "Endpoint to allocate students to project",
+            summary = "Assign school, teacher and students to Project",
+            description = "Endpoint to allocate school, teacher and students to project",
             security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
     )
     @ApiResponses(value = {
@@ -141,7 +141,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
-    @PostMapping("/{id}/school/assign")
+    @PostMapping("/{id}/schools/assign")
     public ResponseEntity<?> assignProjectToStudents(@PathVariable Long id, @RequestBody ProjectAssignRequest projectAssignRequest) {
         ResponseMessage responseMessage = projectService.assignProjectToSchool(id, projectAssignRequest);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
@@ -160,7 +160,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
-    @GetMapping("/school")
+    @GetMapping("/schools")
     public ResponseEntity<?> getProjectSchoolMapping(@RequestParam Long schoolId) {
         ProjectSchoolMappingResponse projectSchoolMapping = projectService.getProjectSchoolMapping(schoolId);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(projectSchoolMapping).build());
@@ -179,7 +179,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
-    @PostMapping("/{id}/school/unassign")
+    @PostMapping("/{id}/schools/un-assign")
     public ResponseEntity<?> unAssignProjectToStudents(@PathVariable Long id, @RequestBody ProjectUnAssignRequest projectUnAssignRequest) {
         ResponseMessage responseMessage = projectService.unAssignProjectToSchool(id, projectUnAssignRequest);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
