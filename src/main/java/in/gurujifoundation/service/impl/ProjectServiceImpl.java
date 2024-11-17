@@ -8,12 +8,9 @@ import in.gurujifoundation.mapper.ProjectMapper;
 import in.gurujifoundation.mapper.TopicMapper;
 import in.gurujifoundation.repository.ProjectRepository;
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
-import in.gurujifoundation.request.CreateOrUpdateTopicRequest;
 import in.gurujifoundation.request.ProjectAssignRequest;
 import in.gurujifoundation.request.ProjectStudentAllocationDeAllocationRequest;
-import in.gurujifoundation.response.ProjectDetails;
-import in.gurujifoundation.response.ProjectResponse;
-import in.gurujifoundation.response.ResponseMessage;
+import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -188,7 +185,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ResponseMessage assignProjectToStudents(Long id, ProjectAssignRequest projectAssignRequest) {
+    public ResponseMessage assignProjectToSchool(Long id, ProjectAssignRequest projectAssignRequest) {
         try {
             Project project = getProject(id);
             School school = schoolService.getSchool(projectAssignRequest.getSchoolId());
@@ -198,6 +195,17 @@ public class ProjectServiceImpl implements ProjectService {
             return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_ASSIGNED_SCHOOL_TEACHER_AND_STUDENTS_TO_PROJECT).build();
         } catch (Exception e) {
             log.error("Error occurred while assigning school, teacher and students to project with id: {}", id, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
+
+    @Override
+    public ProjectSchoolMappingResponse getProjectSchoolMapping(Long SchoolId) {
+        try {
+            List<SchoolProjectMappingDetails> schoolProjectMappingDetails = schoolProjectMappingService.getAllSchoolProjectMappings(SchoolId);
+            return ProjectSchoolMappingResponse.builder().schoolProjectMappings(schoolProjectMappingDetails).build();
+        } catch (Exception e) {
+            log.error("Error occurred while fetching associated project to school for id: {}", SchoolId, e);
             throw new InternalServerException("Unexpected error occurred");
         }
     }
