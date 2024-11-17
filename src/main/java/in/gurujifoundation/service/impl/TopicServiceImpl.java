@@ -100,6 +100,12 @@ public class TopicServiceImpl implements TopicService {
         }
     }
 
+    @Override
+    public ResponseMessage deleteTopics(Set<Topic> topics) {
+        topicRepository.deleteAll(topics);
+        return null;
+    }
+
     public Topic getTopic(Long id) {
         Optional<Topic> topicOptional = topicRepository.findById(id);
         if (topicOptional.isEmpty()) {

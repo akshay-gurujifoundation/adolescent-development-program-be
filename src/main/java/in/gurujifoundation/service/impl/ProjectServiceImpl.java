@@ -145,6 +145,12 @@ public class ProjectServiceImpl implements ProjectService {
     public ResponseMessage deleteProject(Long id) {
         try {
             log.debug("Started deleting project with id: {}", id);
+            Project project = getProject(id);
+            Set<Topic> topics = project.getTopics();
+            topicService.deleteTopics(topics);
+
+            Set<SchoolProjectMapping> schoolProjects = project.getSchoolProjects();
+            schoolProjectMappingService.deleteSchoolProjectMappings(schoolProjects);
             projectRepository.deleteById(id);
             log.debug("Successfully deleted project with id: {}", id);
             return ResponseMessage.builder().message(ErrorCodeConstant.PROJECT_DELETED_SUCCESSFULLY).build();

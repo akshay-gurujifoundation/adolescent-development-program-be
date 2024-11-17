@@ -6,6 +6,7 @@ import in.gurujifoundation.response.SchoolProjectMappingDetails;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
+import java.util.Set;
 
 public interface SchoolProjectMappingService {
 
@@ -16,4 +17,6 @@ public interface SchoolProjectMappingService {
     SchoolProjectMapping getSchoolProjectMapping(Long id, @NotEmpty Long schoolId);
 
     void save(SchoolProjectMapping schoolProjectMapping);
+
+    void deleteSchoolProjectMappings(Set<SchoolProjectMapping> schoolProjects);
 }

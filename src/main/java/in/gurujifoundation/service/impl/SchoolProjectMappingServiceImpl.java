@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -63,5 +64,10 @@ public class SchoolProjectMappingServiceImpl implements SchoolProjectMappingServ
     @Override
     public void save(SchoolProjectMapping schoolProjectMapping) {
         schoolProjectMappingRepository.save(schoolProjectMapping);
+    }
+
+    @Override
+    public void deleteSchoolProjectMappings(Set<SchoolProjectMapping> schoolProjects) {
+        schoolProjectMappingRepository.deleteAll(schoolProjects);
     }
 }

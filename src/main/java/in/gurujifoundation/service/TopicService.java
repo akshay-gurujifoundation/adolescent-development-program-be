@@ -8,7 +8,6 @@ import in.gurujifoundation.response.TopicDetails;
 import in.gurujifoundation.response.TopicResponse;
 import jakarta.validation.Valid;
 
-import java.util.List;
 import java.util.Set;
 
 public interface TopicService {
@@ -21,6 +20,7 @@ public interface TopicService {
     TopicResponse getAllTopics(Long projectId);
 
     ResponseMessage deleteTopic(Long id);
+    ResponseMessage deleteTopics(Set<Topic> ids);
 
     Topic getTopic(Long id);
 
