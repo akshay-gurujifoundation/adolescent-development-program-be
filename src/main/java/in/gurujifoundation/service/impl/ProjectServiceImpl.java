@@ -7,10 +7,7 @@ import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.ProjectMapper;
 import in.gurujifoundation.mapper.TopicMapper;
 import in.gurujifoundation.repository.ProjectRepository;
-import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
-import in.gurujifoundation.request.ProjectAssignRequest;
-import in.gurujifoundation.request.ProjectStudentAssignUnAssignRequest;
-import in.gurujifoundation.request.ProjectUnAssignRequest;
+import in.gurujifoundation.request.*;
 import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -98,9 +94,26 @@ public class ProjectServiceImpl implements ProjectService {
     public ResponseMessage updateProject(CreateOrUpdateProjectRequest updateProjectRequest, Long id) {
         try {
             log.debug("Started updating project with id: {}", id);
-            Project Project = getProject(id);
-            ProjectMapper.INSTANCE.updateProject(Project, updateProjectRequest);
-            projectRepository.save(Project);
+            Project project = getProject(id);
+            Set<ProjectCoordinator> currentCoordinators = project.getProjectCoordinators();
+            List<Long> newCoordinatorIds = updateProjectRequest.getProjectCoordinatorIds();
+
+            currentCoordinators.removeIf(coordinator -> !newCoordinatorIds.contains(coordinator.getId()));
+
+            for (Long coordinatorId : newCoordinatorIds) {
+                boolean coordinatorExists = currentCoordinators.stream().anyMatch(coordinator -> coordinator.getId().equals(coordinatorId));
+                if (!coordinatorExists) {
+                    ProjectCoordinator projectCoordinator = projectCoordinatorService.getProjectCoordinator(coordinatorId);
+                    currentCoordinators.add(projectCoordinator);
+                }
+            }
+
+            project.setProjectCoordinators(currentCoordinators);
+
+            Set<Topic> createOrUpdateOrDeleteTopics = topicService.createOrUpdateOrDeleteTopics(project, updateProjectRequest.getCreateOrUpdateTopicRequests());
+            project.setTopics(createOrUpdateOrDeleteTopics);
+            topicService.saveTopics(createOrUpdateOrDeleteTopics);
+            projectRepository.save(project);
             log.debug("Successfully updated project with id: {}", id);
             return ResponseMessage.builder().message(ErrorCodeConstant.PROJECT_UPDATED_SUCCESSFULLY).build();
         } catch (Exception e) {

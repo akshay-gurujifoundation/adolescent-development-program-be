@@ -1,8 +1,10 @@
 package in.gurujifoundation.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import in.gurujifoundation.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -46,8 +48,10 @@ public class Project extends Auditable {
     @Column(length = 50)
     private String status;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @Builder.Default
+
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @Column()
+    @JsonIgnoreProperties({"project"})
     private Set<Topic> topics = new HashSet<>();
 
     @NotAudited

@@ -16,9 +16,9 @@ import in.gurujifoundation.service.TopicService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -112,4 +112,61 @@ public class TopicServiceImpl implements TopicService {
     public void saveTopics(Set<Topic> topics) {
         topicRepository.saveAll(topics);
     }
+
+    @Override
+    public Set<Topic> createOrUpdateOrDeleteTopics(Project project, Set<CreateOrUpdateTopicRequest> topicRequests) {
+        // Map requests by topic ID (assuming CreateOrUpdateTopicRequest has an `id` field for existing topics)
+        Map<Long, CreateOrUpdateTopicRequest> topicRequestMap = topicRequests.stream()
+                .filter(request -> request.getId() != null)
+                .collect(Collectors.toMap(CreateOrUpdateTopicRequest::getId, Function.identity()));
+
+        // Map existing topics by topic ID
+        Map<Long, Topic> existingTopicsMap = project.getTopics().stream()
+                .filter(topic -> topic.getId() != null)
+                .collect(Collectors.toMap(Topic::getId, Function.identity()));
+
+        Set<Topic> updatedTopics = new HashSet<>();
+
+        // Handle updates and creations
+        for (Map.Entry<Long, CreateOrUpdateTopicRequest> entry : topicRequestMap.entrySet()) {
+            Long topicId = entry.getKey();
+            CreateOrUpdateTopicRequest request = entry.getValue();
+            Topic topic = existingTopicsMap.get(topicId);
+
+            if (topic != null) {
+                // Update existing topic
+                topic.setName(request.getName());
+                topic.setDescription(request.getDescription());
+                existingTopicsMap.remove(topicId);
+            } else {
+                // Create new topic
+                topic = Topic.builder()
+                        .name(request.getName())
+                        .description(request.getDescription())
+                        .project(project)
+                        .build();
+            }
+            updatedTopics.add(topic);
+        }
+
+        for (CreateOrUpdateTopicRequest request : topicRequests) {
+            if (request.getId() == null) {
+                Topic newTopic = Topic.builder()
+                        .name(request.getName())
+                        .description(request.getDescription())
+                        .project(project)
+                        .build();
+                updatedTopics.add(newTopic);
+            }
+        }
+
+
+        // Handle deletions
+        if (!existingTopicsMap.isEmpty()) {
+            topicRepository.deleteAll(existingTopicsMap.values());
+        }
+
+        return updatedTopics;
+    }
+
 }

@@ -1,5 +1,6 @@
 package in.gurujifoundation.service;
 
+import in.gurujifoundation.domain.Project;
 import in.gurujifoundation.domain.Topic;
 import in.gurujifoundation.request.CreateOrUpdateTopicRequest;
 import in.gurujifoundation.response.ResponseMessage;
@@ -24,4 +25,6 @@ public interface TopicService {
     Topic getTopic(Long id);
 
     void saveTopics(Set<Topic> topics);
+
+    Set<Topic> createOrUpdateOrDeleteTopics(Project project, Set<CreateOrUpdateTopicRequest> topicRequests);
 }

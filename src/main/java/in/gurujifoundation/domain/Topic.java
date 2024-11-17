@@ -26,7 +26,7 @@ public class Topic extends Auditable {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false, foreignKey = @ForeignKey(name = "fk_topic_project_id"))
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
     @Column(name = "topic_name", nullable = false, length = 255)
