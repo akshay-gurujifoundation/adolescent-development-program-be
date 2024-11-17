@@ -1,9 +1,6 @@
 package in.gurujifoundation.controller;
 
-import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
-import in.gurujifoundation.request.ProjectAssignRequest;
-import in.gurujifoundation.request.ProjectStudentAllocationDeAllocationRequest;
-import in.gurujifoundation.request.ProjectUnAssignRequest;
+import in.gurujifoundation.request.*;
 import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -185,6 +182,44 @@ public class ProjectController {
     @PostMapping("/{id}/school/unassign")
     public ResponseEntity<?> unAssignProjectToStudents(@PathVariable Long id, @RequestBody ProjectUnAssignRequest projectUnAssignRequest) {
         ResponseMessage responseMessage = projectService.unAssignProjectToSchool(id, projectUnAssignRequest);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
+    @Operation(
+            summary = "Assign students to Project",
+            description = "Endpoint to assign students to project",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Students assign to project successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @PostMapping("/{id}/schools/students/assign")
+    public ResponseEntity<?> assignStudentToProject(@PathVariable Long id, @RequestBody ProjectStudentAssignUnAssignRequest projectStudentAssignUnAssignRequest) {
+        ResponseMessage responseMessage = projectService.assignStudentToProject(id, projectStudentAssignUnAssignRequest);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
+    @Operation(
+            summary = "Un-assign students to Project",
+            description = "Endpoint to un-assign students to project",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Students un-assign to project successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @PostMapping("/{id}/schools/students/un-assign")
+    public ResponseEntity<?> unAssignStudentToProject(@PathVariable Long id, @RequestBody ProjectStudentAssignUnAssignRequest projectStudentAssignUnAssignRequest) {
+        ResponseMessage responseMessage = projectService.unAssignStudentToProject(id, projectStudentAssignUnAssignRequest);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
 

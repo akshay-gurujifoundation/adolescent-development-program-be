@@ -9,6 +9,7 @@ import in.gurujifoundation.mapper.TopicMapper;
 import in.gurujifoundation.repository.ProjectRepository;
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
 import in.gurujifoundation.request.ProjectAssignRequest;
+import in.gurujifoundation.request.ProjectStudentAssignUnAssignRequest;
 import in.gurujifoundation.request.ProjectUnAssignRequest;
 import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.*;
@@ -212,6 +213,34 @@ public class ProjectServiceImpl implements ProjectService {
         schoolProjectMapping.setStudents(currentStudents);
         schoolProjectMappingService.save(schoolProjectMapping);
         return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_ASSIGNED_SCHOOL_TEACHER_AND_STUDENTS_TO_PROJECT).build();
+    }
+
+    @Override
+    public ResponseMessage assignStudentToProject(Long id, ProjectStudentAssignUnAssignRequest projectStudentAssignUnAssignRequest) {
+        try {
+            SchoolProjectMapping schoolProjectMapping = schoolProjectMappingService.getSchoolProjectMapping(id, projectStudentAssignUnAssignRequest.getSchoolId());
+            List<Student> studentList = studentService.getStudentsByIds(projectStudentAssignUnAssignRequest.getStudentIds());
+            schoolProjectMapping.getStudents().addAll(studentList);
+            schoolProjectMappingService.save(schoolProjectMapping);
+            return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_ASSIGNED_STUDENT_TO_PROJECT).build();
+        } catch (Exception e) {
+            log.error("Error occurred while associated student to project for id: {}", id, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
+
+    @Override
+    public ResponseMessage unAssignStudentToProject(Long id, ProjectStudentAssignUnAssignRequest projectStudentAssignUnAssignRequest) {
+        try {
+            SchoolProjectMapping schoolProjectMapping = schoolProjectMappingService.getSchoolProjectMapping(id, projectStudentAssignUnAssignRequest.getSchoolId());
+            List<Student> studentList = studentService.getStudentsByIds(projectStudentAssignUnAssignRequest.getStudentIds());
+            studentList.forEach(schoolProjectMapping.getStudents()::remove);
+            schoolProjectMappingService.save(schoolProjectMapping);
+            return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_UN_ASSIGNED_STUDENT_TO_PROJECT).build();
+        } catch (Exception e) {
+            log.error("Error occurred while associated student to project for id: {}", id, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
     }
 
 }

@@ -1,10 +1,7 @@
 package in.gurujifoundation.service;
 
 import in.gurujifoundation.domain.Project;
-import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
-import in.gurujifoundation.request.ProjectAssignRequest;
-import in.gurujifoundation.request.ProjectStudentAllocationDeAllocationRequest;
-import in.gurujifoundation.request.ProjectUnAssignRequest;
+import in.gurujifoundation.request.*;
 import in.gurujifoundation.response.ProjectSchoolMappingResponse;
 import in.gurujifoundation.response.ProjectDetails;
 import in.gurujifoundation.response.ProjectResponse;
@@ -30,4 +27,8 @@ public interface ProjectService {
     ProjectSchoolMappingResponse getProjectSchoolMapping(Long SchoolId);
 
     ResponseMessage unAssignProjectToSchool(Long id, ProjectUnAssignRequest projectUnAssignRequest);
+
+    ResponseMessage assignStudentToProject(Long id, ProjectStudentAssignUnAssignRequest projectStudentAssignUnAssignRequest);
+
+    ResponseMessage unAssignStudentToProject(Long id, ProjectStudentAssignUnAssignRequest projectStudentAssignUnAssignRequest);
 }

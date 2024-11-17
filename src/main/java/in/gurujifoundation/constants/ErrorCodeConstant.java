@@ -35,4 +35,6 @@ public interface ErrorCodeConstant {
     String TEACHER_ID_CAN_NOT_BE_NULL_OR_BLANK = "Teacher id cannot be null or blank";
     String STUDENT_IDS_CANNOT_BE_NULL_OR_EMPTY = "Student ids cannot be null or empty";
     String SUCCESSFULLY_ASSIGNED_SCHOOL_TEACHER_AND_STUDENTS_TO_PROJECT = "Successfully assigned school, teacher and students to project";
+    String SUCCESSFULLY_ASSIGNED_STUDENT_TO_PROJECT = "Successfully assigned student to project";
+    String SUCCESSFULLY_UN_ASSIGNED_STUDENT_TO_PROJECT = "Successfully un-assigned student to project";
 }

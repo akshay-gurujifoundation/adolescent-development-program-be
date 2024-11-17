@@ -7,6 +7,7 @@ import in.gurujifoundation.response.StudentDetails;
 import in.gurujifoundation.response.StudentsResponse;
 
 import java.util.List;
+import java.util.Set;
 
 public interface StudentService {
     ResponseMessage createStudent(CreateOrUpdateStudentRequest request);
@@ -21,7 +22,7 @@ public interface StudentService {
 
     Student getStudent(Long id);
 
-    List<Student> getStudentsByIds(List<Long> studentIds);
+    List<Student> getStudentsByIds(Set<Long> studentIds);
 
     void updateStudents(List<Student> students);
 
