@@ -136,7 +136,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public StudentsResponse getStudentsNotInSchoolProject(Long projectId, Long schoolId) {
         try {
-            List<Student> studentsNotInSchoolProject = studentRepository.findStudentsNotInProjectBySchool(projectId, schoolId);
+            List<Student> studentsNotInSchoolProject = studentRepository.findStudentsNotInProjectBySchoolJPQL(projectId, schoolId);
 
             List<StudentDetails> studentsDetails = StudentMapper.INSTANCE.toStudentsDetails(studentsNotInSchoolProject);
             return StudentsResponse.builder().students(studentsDetails).build();

@@ -9,6 +9,7 @@ import in.gurujifoundation.mapper.TopicMapper;
 import in.gurujifoundation.repository.ProjectRepository;
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
 import in.gurujifoundation.request.ProjectAssignRequest;
+import in.gurujifoundation.request.ProjectUnAssignRequest;
 import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -178,6 +181,37 @@ public class ProjectServiceImpl implements ProjectService {
             log.error("Error occurred while fetching associated project to school for id: {}", SchoolId, e);
             throw new InternalServerException("Unexpected error occurred");
         }
+    }
+
+    @Override
+    public ResponseMessage unAssignProjectToSchool(Long id, ProjectUnAssignRequest projectUnAssignRequest) {
+        SchoolProjectMapping schoolProjectMapping = schoolProjectMappingService.getSchoolProjectMapping(id, projectUnAssignRequest.getSchoolId());
+        if (projectUnAssignRequest.getTeacherId() != null) {
+            Teacher teacher = teacherService.getTeacher(projectUnAssignRequest.getTeacherId());
+            schoolProjectMapping.setTeacher(teacher);
+        }
+
+        // Get the current set of students assigned to this project
+        Set<Student> currentStudents = schoolProjectMapping.getStudents();
+
+        Set<Long> newStudentIds = projectUnAssignRequest.getStudentIds();
+
+        // Loop through the current students and remove those that are no longer in the UI list
+        // Remove student from the current set
+        currentStudents.removeIf(student -> !newStudentIds.contains(student.getId()));
+
+        // Loop through the new student IDs and add those that are not already assigned
+        for (Long studentId : newStudentIds) {
+            boolean studentExists = currentStudents.stream().anyMatch(student -> student.getId().equals(studentId));
+            if (!studentExists) {
+                Student studentToAdd = studentService.getStudent(studentId);
+                currentStudents.add(studentToAdd); // Add new student to the set
+            }
+        }
+
+        schoolProjectMapping.setStudents(currentStudents);
+        schoolProjectMappingService.save(schoolProjectMapping);
+        return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_ASSIGNED_SCHOOL_TEACHER_AND_STUDENTS_TO_PROJECT).build();
     }
 
 }

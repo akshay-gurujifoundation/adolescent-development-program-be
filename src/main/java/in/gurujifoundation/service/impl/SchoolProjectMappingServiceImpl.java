@@ -1,17 +1,20 @@
 package in.gurujifoundation.service.impl;
 
 import in.gurujifoundation.domain.*;
+import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.SchoolProjectMappingMapper;
 import in.gurujifoundation.repository.SchoolProjectMappingRepository;
 import in.gurujifoundation.response.SchoolProjectMappingDetails;
 import in.gurujifoundation.service.SchoolProjectMappingService;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -46,5 +49,19 @@ public class SchoolProjectMappingServiceImpl implements SchoolProjectMappingServ
         }
         return SchoolProjectMappingMapper.INSTANCE.mapToSchoolProjectMappingDerailsList(schoolProjectMappings);
 
+    }
+
+    @Override
+    public SchoolProjectMapping getSchoolProjectMapping(Long id, Long schoolId) {
+        Optional<SchoolProjectMapping> schoolProjectMappingOpt = schoolProjectMappingRepository.findByProjectIdAndSchoolId(id, schoolId);
+        if (schoolProjectMappingOpt.isEmpty()) {
+            throw new EntityNotFoundException("School project mapping with id " + id + " not found");
+        }
+        return schoolProjectMappingOpt.get();
+    }
+
+    @Override
+    public void save(SchoolProjectMapping schoolProjectMapping) {
+        schoolProjectMappingRepository.save(schoolProjectMapping);
     }
 }

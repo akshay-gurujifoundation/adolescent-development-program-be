@@ -3,6 +3,7 @@ package in.gurujifoundation.controller;
 import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
 import in.gurujifoundation.request.ProjectAssignRequest;
 import in.gurujifoundation.request.ProjectStudentAllocationDeAllocationRequest;
+import in.gurujifoundation.request.ProjectUnAssignRequest;
 import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -182,8 +183,8 @@ public class ProjectController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/{id}/school/unassign")
-    public ResponseEntity<?> unAssignProjectToStudents(@PathVariable Long id, @RequestBody ProjectAssignRequest projectAssignRequest) {
-        ResponseMessage responseMessage = projectService.assignProjectToSchool(id, projectAssignRequest);
+    public ResponseEntity<?> unAssignProjectToStudents(@PathVariable Long id, @RequestBody ProjectUnAssignRequest projectUnAssignRequest) {
+        ResponseMessage responseMessage = projectService.unAssignProjectToSchool(id, projectUnAssignRequest);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
 
