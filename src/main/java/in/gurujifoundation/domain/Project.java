@@ -34,18 +34,6 @@ public class Project extends Auditable {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "start_date")
-    private LocalDate startDate;
-
-    @Column(name = "end_date")
-    private LocalDate endDate;
-
-    @Column(name = "actual_start_date")
-    private LocalDate actualStartDate;
-
-    @Column(name = "actual_end_date")
-    private LocalDate actualEndDate;
-
     @ManyToMany
     @JoinTable(
             name = "project_project_coordinator",

@@ -25,10 +25,6 @@ public interface ProjectMapper {
     Project mapToEntity(CreateOrUpdateProjectRequest createOrUpdateProjectRequest, Set<ProjectCoordinator> projectCoordinators);
 
     @Mapping(target = "description", source = "project.description")
-    @Mapping(target = "startDate", source = "project.startDate")
-    @Mapping(target = "endDate", source = "project.endDate")
-    @Mapping(target = "actualStartDate", source = "project.actualStartDate")
-    @Mapping(target = "actualEndDate", source = "project.actualEndDate")
     @Mapping(target = "status", source = "project.status")
     @Mapping(target = "topics", source = "project.topics")
     @Mapping(target = "projectCoordinators", source = "project.projectCoordinators")

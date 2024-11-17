@@ -15,10 +15,6 @@ public class ProjectDetails {
     private Long id;
     private String name;
     private String description;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private LocalDate actualStartDate;
-    private LocalDate actualEndDate;
     private String status;
     private List<TopicDetails> topics = new ArrayList<>();
     private List<ProjectCoordinatorDetails> projectCoordinators = new ArrayList<>();
