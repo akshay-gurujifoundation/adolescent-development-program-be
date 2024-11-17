@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -129,5 +128,19 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public void updateStudents(List<Student> students) {
         studentRepository.saveAll(students);
+    }
+
+    @Override
+    public StudentsResponse getStudentsNotInSchoolProject(Long projectId) {
+        try {
+            List<Student> studentsNotInSchoolProject = studentRepository.findStudentsNotInSchoolProject(projectId);
+
+            List<StudentDetails> studentsDetails = StudentMapper.INSTANCE.toStudentsDetails(studentsNotInSchoolProject);
+            return StudentsResponse.builder().students(studentsDetails).build();
+        } catch (Exception e) {
+            log.error("Error occurred while fetching student which are not assigned to project with id: {}", projectId, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+
     }
 }

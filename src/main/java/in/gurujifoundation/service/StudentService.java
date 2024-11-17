@@ -22,4 +22,6 @@ public interface StudentService {
     List<Student> getStudentsByIds( List<Long> studentIds);
 
     void updateStudents(List<Student> students);
+
+    StudentsResponse getStudentsNotInSchoolProject(Long projectId);
 }
