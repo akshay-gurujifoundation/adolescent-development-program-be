@@ -151,4 +151,26 @@ public class StudentController {
         StudentsResponse studentsResponse = studentService.getStudentsNotInSchoolProject(projectId, schoolId);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(studentsResponse).build());
     }
+
+
+    @Operation(
+            summary = "Get all assigned students of project for school",
+            description = "Endpoint to retrieve assigned students of project for school",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "students retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentsResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("projects/assigned-students")
+    public ResponseEntity<?> getStudentsInSchoolProject(@RequestParam(value = "projectId") Long projectId, @RequestParam(value = "schoolId") Long schoolId) {
+        StudentsResponse studentsResponse = studentService.getStudentsInSchoolProject(projectId, schoolId);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(studentsResponse).build());
+    }
+
 }

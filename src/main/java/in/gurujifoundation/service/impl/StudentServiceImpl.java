@@ -141,7 +141,6 @@ public class StudentServiceImpl implements StudentService {
     public StudentsResponse getStudentsNotInSchoolProject(Long projectId, Long schoolId) {
         try {
             List<Student> studentsNotInSchoolProject = studentRepository.findStudentsNotInProjectBySchool(schoolId, projectId);
-
             List<StudentDetails> studentsDetails = StudentMapper.INSTANCE.toStudentsDetails(studentsNotInSchoolProject);
             return StudentsResponse.builder().students(studentsDetails).build();
         } catch (Exception e) {
@@ -149,5 +148,17 @@ public class StudentServiceImpl implements StudentService {
             throw new InternalServerException("Unexpected error occurred");
         }
 
+    }
+
+    @Override
+    public StudentsResponse getStudentsInSchoolProject(Long projectId, Long schoolId) {
+        try {
+            List<Student> studentsNotInSchoolProject = studentRepository.findStudentsInProjectBySchool(schoolId, projectId);
+            List<StudentDetails> studentsDetails = StudentMapper.INSTANCE.toStudentsDetails(studentsNotInSchoolProject);
+            return StudentsResponse.builder().students(studentsDetails).build();
+        } catch (Exception e) {
+            log.error("Error occurred while fetching student which are assigned to project with id: {} for school Id {}", projectId, schoolId, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
     }
 }
