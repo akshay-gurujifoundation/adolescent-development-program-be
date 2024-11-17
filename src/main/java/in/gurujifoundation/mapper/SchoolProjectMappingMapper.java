@@ -29,6 +29,10 @@ public interface SchoolProjectMappingMapper {
     @Mapping(target = "school", source = "schoolProjectMapping.school")
     @Mapping(target = "teacher", source = "schoolProjectMapping.teacher")
     @Mapping(target = "students", source = "schoolProjectMapping.students")
+    @Mapping(target = "startDate", source = "schoolProjectMapping.startDate")
+    @Mapping(target = "endDate", source = "schoolProjectMapping.endDate")
+    @Mapping(target = "actualStartDate", source = "schoolProjectMapping.actualStartDate")
+    @Mapping(target = "actualEndDate", source = "schoolProjectMapping.actualEndDate")
     SchoolProjectMappingDetails mapToSchoolProjectMappingDetails(SchoolProjectMapping schoolProjectMapping);
 
     List<SchoolProjectMappingDetails> mapToSchoolProjectMappingDerailsList(List<SchoolProjectMapping> schoolProjectMappings);
