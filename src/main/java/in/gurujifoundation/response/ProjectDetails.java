@@ -21,5 +21,6 @@ public class ProjectDetails {
     private LocalDate actualEndDate;
     private String status;
     private List<TopicDetails> topics = new ArrayList<>();
+    private List<ProjectCoordinatorDetails> projectCoordinators = new ArrayList<>();
 //    private List<SchoolProjectMappingDetails> schoolProjects = new ArrayList<>();
 }

@@ -33,6 +33,19 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             @Param("schoolId") Long schoolId,
             @Param("projectId") Long projectId);
 
+    @Query("""
+       SELECT s
+       FROM Student s
+       WHERE s.school.id = :schoolId
+         AND s.id NOT IN (
+               SELECT spmStudent.id
+               FROM SchoolProjectMapping spm
+                        JOIN spm.students spmStudent
+               WHERE spm.project.id = :projectId
+                 AND spm.school.id = :schoolId
+       )
+       """)
+    List<Student> findStudentsNotInProjectBySchoolJPQL(@Param("schoolId") Long schoolId, @Param("projectId") Long projectId);
 
 
 }

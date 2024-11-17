@@ -35,6 +35,7 @@ public interface ProjectMapper {
     @Mapping(target = "actualEndDate", source = "project.actualEndDate")
     @Mapping(target = "status", source = "project.status")
     @Mapping(target = "topics", source = "project.topics")
+    @Mapping(target = "projectCoordinators", source = "project.projectCoordinators")
     ProjectDetails mapToProjectDetailsResponse(Project project);
 
     List<ProjectDetails> mapToProjectDetailsList(List<Project> projects);
