@@ -16,6 +16,7 @@ public interface ProjectCoordinatorMapper {
     ProjectCoordinatorMapper INSTANCE = Mappers.getMapper(ProjectCoordinatorMapper.class);
 
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "name", source = "createOrUpdateProjectCoordinatorRequest.name")
     @Mapping(target = "areaOfExpertise", source = "createOrUpdateProjectCoordinatorRequest.areaOfExpertise")
     @Mapping(target = "availability", source = "createOrUpdateProjectCoordinatorRequest.availability")
