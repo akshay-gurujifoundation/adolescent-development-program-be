@@ -156,7 +156,7 @@ public class ProjectController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Retrieve project mapping successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectSchoolMappingResponse.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
