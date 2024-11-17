@@ -1,5 +1,6 @@
 package in.gurujifoundation.mapper;
 
+import in.gurujifoundation.domain.Parent;
 import in.gurujifoundation.domain.School;
 import in.gurujifoundation.domain.Student;
 import in.gurujifoundation.request.CreateOrUpdateStudentRequest;
@@ -52,5 +53,10 @@ public interface StudentMapper {
     @Mapping(target = "alternativeNumber", source = "studentDetails.alternativeNumber")
     @Mapping(target = "email", source = "studentDetails.email")
     @Mapping(target = "school", source = "school")
-    void updateStudent(CreateOrUpdateStudentRequest studentDetails, @MappingTarget Student student, School school);
+    @Mapping(target = "parent", source = "parent")
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    void updateStudent(CreateOrUpdateStudentRequest studentDetails, @MappingTarget Student student, School school, Parent parent);
 }

@@ -6,6 +6,7 @@ import in.gurujifoundation.domain.School;
 import in.gurujifoundation.domain.Student;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
+import in.gurujifoundation.mapper.ParentMapper;
 import in.gurujifoundation.mapper.StudentMapper;
 import in.gurujifoundation.repository.ParentRepository;
 import in.gurujifoundation.repository.StudentRepository;
@@ -90,9 +91,11 @@ public class StudentServiceImpl implements StudentService {
         try {
             Student student = getStudent(id);
             School school = schoolService.getSchool(request.getSchoolId());
-            StudentMapper.INSTANCE.updateStudent(request, student, school);
+            Parent parent = student.getParent();
+            ParentMapper.INSTANCE.updateParent(request.getParent(), parent);
+            StudentMapper.INSTANCE.updateStudent(request, student, school, parent);
             studentRepository.save(student);
-            return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_UPDATED_SUCCESSFULLY).build();
+            return ResponseMessage.builder().message(ErrorCodeConstant.STUDENT_UPDATED_SUCCESSFULLY).build();
         } catch (Exception e) {
             log.error("Error occurred while updating student with email: {}", request.getEmail(), e);
             throw new InternalServerException("Unexpected error occurred");

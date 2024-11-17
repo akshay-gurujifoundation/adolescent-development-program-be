@@ -17,7 +17,7 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "student")
 @EqualsAndHashCode(callSuper = false, exclude = {"parent", "projects", "school"})
-@ToString(exclude = {"parent"})
+@ToString(exclude = {"projects", "school"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Student extends Auditable {
