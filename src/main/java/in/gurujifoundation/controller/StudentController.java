@@ -133,8 +133,8 @@ public class StudentController {
     }
 
     @Operation(
-            summary = "Get all unassigned students of project",
-            description = "Endpoint to retrieve unassigned students of project",
+            summary = "Get all unassigned students of project for school",
+            description = "Endpoint to retrieve unassigned students of project for school",
             security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
     )
     @ApiResponses(value = {
@@ -147,8 +147,8 @@ public class StudentController {
     })
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("projects/unassigned-students")
-    public ResponseEntity<?> getStudentsNotInSchoolProject(@RequestParam(value = "projectId") Long projectId) {
-        StudentsResponse studentsResponse = studentService.getStudentsNotInSchoolProject(projectId);
+    public ResponseEntity<?> getStudentsNotInSchoolProject(@RequestParam(value = "projectId") Long projectId, @RequestParam(value = "schoolId") Long schoolId) {
+        StudentsResponse studentsResponse = studentService.getStudentsNotInSchoolProject(projectId, schoolId);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(studentsResponse).build());
     }
 }

@@ -10,7 +10,10 @@ import in.gurujifoundation.mapper.StudentMapper;
 import in.gurujifoundation.repository.ParentRepository;
 import in.gurujifoundation.repository.StudentRepository;
 import in.gurujifoundation.request.CreateOrUpdateStudentRequest;
-import in.gurujifoundation.response.*;
+import in.gurujifoundation.response.ResponseMessage;
+import in.gurujifoundation.response.SchoolDetails;
+import in.gurujifoundation.response.StudentDetails;
+import in.gurujifoundation.response.StudentsResponse;
 import in.gurujifoundation.service.SchoolService;
 import in.gurujifoundation.service.StudentService;
 import lombok.extern.slf4j.Slf4j;
@@ -131,14 +134,14 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public StudentsResponse getStudentsNotInSchoolProject(Long projectId) {
+    public StudentsResponse getStudentsNotInSchoolProject(Long projectId, Long schoolId) {
         try {
-            List<Student> studentsNotInSchoolProject = studentRepository.findStudentsNotInSchoolProject(projectId);
+            List<Student> studentsNotInSchoolProject = studentRepository.findStudentsNotInProjectBySchool(projectId, schoolId);
 
             List<StudentDetails> studentsDetails = StudentMapper.INSTANCE.toStudentsDetails(studentsNotInSchoolProject);
             return StudentsResponse.builder().students(studentsDetails).build();
         } catch (Exception e) {
-            log.error("Error occurred while fetching student which are not assigned to project with id: {}", projectId, e);
+            log.error("Error occurred while fetching student which are not assigned to project with id: {} for school Id {}", projectId, schoolId, e);
             throw new InternalServerException("Unexpected error occurred");
         }
 

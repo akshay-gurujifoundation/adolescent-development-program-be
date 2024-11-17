@@ -2,7 +2,9 @@ package in.gurujifoundation.service;
 
 import in.gurujifoundation.domain.Student;
 import in.gurujifoundation.request.CreateOrUpdateStudentRequest;
-import in.gurujifoundation.response.*;
+import in.gurujifoundation.response.ResponseMessage;
+import in.gurujifoundation.response.StudentDetails;
+import in.gurujifoundation.response.StudentsResponse;
 
 import java.util.List;
 
@@ -19,9 +21,9 @@ public interface StudentService {
 
     Student getStudent(Long id);
 
-    List<Student> getStudentsByIds( List<Long> studentIds);
+    List<Student> getStudentsByIds(List<Long> studentIds);
 
     void updateStudents(List<Student> students);
 
-    StudentsResponse getStudentsNotInSchoolProject(Long projectId);
+    StudentsResponse getStudentsNotInSchoolProject(Long projectId, Long schoolId);
 }
