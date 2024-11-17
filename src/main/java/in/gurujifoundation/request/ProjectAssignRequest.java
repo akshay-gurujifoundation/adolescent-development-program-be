@@ -21,7 +21,6 @@ public class ProjectAssignRequest {
     private Long schoolId;
 
     @Schema(description = "Teacher to be assigned to project", example = "1")
-    @NotEmpty(message = ErrorCodeConstant.TEACHER_ID_CAN_NOT_BE_NULL_OR_BLANK)
     private Long teacherId;
 
     @Schema(description = "Students to be assigned to project", example = "[1,2]")
