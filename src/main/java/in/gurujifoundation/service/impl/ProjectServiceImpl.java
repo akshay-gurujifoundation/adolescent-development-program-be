@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -38,9 +39,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final TopicService topicService;
 
+    private final PerformanceService performanceService;
+
     @Autowired
     @Lazy
-    public ProjectServiceImpl(SchoolService schoolService, ProjectRepository projectRepository, StudentService studentService, SchoolService schoolService1, TeacherService teacherService, SchoolProjectMappingService schoolProjectMappingService, ProjectCoordinatorService projectCoordinatorService, TopicService topicService) {
+    public ProjectServiceImpl(SchoolService schoolService, ProjectRepository projectRepository, StudentService studentService, SchoolService schoolService1, TeacherService teacherService, SchoolProjectMappingService schoolProjectMappingService, ProjectCoordinatorService projectCoordinatorService, TopicService topicService, PerformanceService performanceService) {
         this.projectRepository = projectRepository;
         this.studentService = studentService;
         this.schoolService = schoolService;
@@ -48,6 +51,7 @@ public class ProjectServiceImpl implements ProjectService {
         this.schoolProjectMappingService = schoolProjectMappingService;
         this.projectCoordinatorService = projectCoordinatorService;
         this.topicService = topicService;
+        this.performanceService = performanceService;
     }
 
     @Override
@@ -247,6 +251,15 @@ public class ProjectServiceImpl implements ProjectService {
             List<Student> studentList = studentService.getStudentsByIds(projectStudentAssignUnAssignRequest.getStudentIds());
             schoolProjectMapping.getStudents().addAll(studentList);
             schoolProjectMappingService.save(schoolProjectMapping);
+            Set<Topic> projectTopics = schoolProjectMapping.getProject().getTopics();
+            List<Performance> performanceEntries = new ArrayList<>();
+            for (Student student : studentList) {
+                for (Topic topic : projectTopics) {
+                    Performance performance = Performance.builder().student(student).topic(topic).beforeInterventionMark(0f).afterInterventionMark(0f).build();
+                    performanceEntries.add(performance);
+                }
+            }
+            performanceService.savePerformances(performanceEntries);
             return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_ASSIGNED_STUDENT_TO_PROJECT).build();
         } catch (Exception e) {
             log.error("Error occurred while associated student to project for id: {}", id, e);
@@ -261,6 +274,13 @@ public class ProjectServiceImpl implements ProjectService {
             List<Student> studentList = studentService.getStudentsByIds(projectStudentAssignUnAssignRequest.getStudentIds());
             studentList.forEach(schoolProjectMapping.getStudents()::remove);
             schoolProjectMappingService.save(schoolProjectMapping);
+            List<Topic> projectTopics = topicService.getTopicsByProjectId(id);
+
+            for (Student student : studentList) {
+                for (Topic topic : projectTopics) {
+                    performanceService.deleteByStudentIdAndTopicId(student.getId(), topic.getId());
+                }
+            }
             return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_UN_ASSIGNED_STUDENT_TO_PROJECT).build();
         } catch (Exception e) {
             log.error("Error occurred while associated student to project for id: {}", id, e);

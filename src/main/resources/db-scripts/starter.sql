@@ -330,25 +330,6 @@ CREATE TABLE topic_aud
     revtype     SMALLINT -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
 );
 
-CREATE TABLE school_project
-(
-    school_id  BIGINT NOT NULL,
-    project_id BIGINT NOT NULL,
-    PRIMARY KEY (school_id, project_id),
-    FOREIGN KEY (school_id) REFERENCES school (id) ON DELETE CASCADE,
-    FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE
-);
-
--- Create the audit table for student_project join table
-CREATE TABLE school_project_aud
-(
-    id         BIGSERIAL,
-    school_id  BIGINT,
-    project_id BIGINT,
-    rev        INT,     -- Revision number
-    revtype    SMALLINT -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
-);
-
 
 
 CREATE TABLE project_coordinator

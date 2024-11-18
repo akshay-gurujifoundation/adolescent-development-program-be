@@ -175,4 +175,9 @@ public class TopicServiceImpl implements TopicService {
         return updatedTopics;
     }
 
+    @Override
+    public List<Topic> getTopicsByProjectId(Long projectId) {
+        return topicRepository.findAllByProjectId(projectId);
+    }
+
 }

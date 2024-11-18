@@ -1,9 +1,11 @@
 package in.gurujifoundation.service;
 
+import in.gurujifoundation.domain.Performance;
 import in.gurujifoundation.request.CreateOrUpdatePerformanceRequest;
-import in.gurujifoundation.request.CreateOrUpdateProjectRequest;
 import in.gurujifoundation.response.*;
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 public interface PerformanceService {
     ResponseMessage createPerformance(@Valid CreateOrUpdatePerformanceRequest createOrUpdatePerformanceRequest);
@@ -16,4 +18,7 @@ public interface PerformanceService {
 
     PerformanceResponse getAllPerformances();
 
+    void savePerformances(List<Performance> performanceEntries);
+
+    void deleteByStudentIdAndTopicId(Long studentId, Long topicId);
 }

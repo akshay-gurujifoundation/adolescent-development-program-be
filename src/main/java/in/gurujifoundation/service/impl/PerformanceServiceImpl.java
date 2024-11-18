@@ -2,7 +2,6 @@ package in.gurujifoundation.service.impl;
 
 import in.gurujifoundation.constants.ErrorCodeConstant;
 import in.gurujifoundation.domain.Performance;
-import in.gurujifoundation.domain.Project;
 import in.gurujifoundation.domain.Student;
 import in.gurujifoundation.domain.Topic;
 import in.gurujifoundation.exception.EntityNotFoundException;
@@ -14,11 +13,9 @@ import in.gurujifoundation.response.PerformanceDetails;
 import in.gurujifoundation.response.PerformanceResponse;
 import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.service.PerformanceService;
-import in.gurujifoundation.service.ProjectService;
 import in.gurujifoundation.service.StudentService;
 import in.gurujifoundation.service.TopicService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.token.TokenService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -98,6 +95,17 @@ public class PerformanceServiceImpl implements PerformanceService {
             log.error("Error occurred while fetching all performances", e);
             throw new InternalServerException("Unexpected error occurred");
         }
+    }
+
+    @Override
+    public void savePerformances(List<Performance> performanceEntries) {
+        performanceRepository.saveAll(performanceEntries);
+    }
+
+    @Override
+    public void deleteByStudentIdAndTopicId(Long studentId, Long topicId) {
+        performanceRepository.deleteByStudentIdAndTopicId(studentId, topicId);
+
     }
 
     @Override
