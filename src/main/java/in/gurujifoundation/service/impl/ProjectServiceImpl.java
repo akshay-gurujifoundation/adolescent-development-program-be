@@ -114,7 +114,7 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
             project.setProjectCoordinators(currentCoordinators);
-
+            ProjectMapper.INSTANCE.updateProject(project, updateProjectRequest);
             Set<Topic> createOrUpdateOrDeleteTopics = topicService.createOrUpdateOrDeleteTopics(project, updateProjectRequest.getCreateOrUpdateTopicRequests());
             project.setTopics(createOrUpdateOrDeleteTopics);
             topicService.saveTopics(createOrUpdateOrDeleteTopics);
