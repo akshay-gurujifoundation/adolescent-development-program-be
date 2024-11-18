@@ -109,4 +109,18 @@ public class SchoolServiceImpl implements SchoolService {
             throw new InternalServerException("Unexpected error occurred");
         }
     }
+
+    @Override
+    public SchoolsResponse getUnAssignSchoolsForProject(Long projectId) {
+        try {
+            log.debug("Started fetching unassigned schools to project");
+            List<School> schools = schoolRepository.findUnAssignedSchoolForProject(projectId);
+            List<SchoolDetails> schoolDetails = SchoolMapper.INSTANCE.mapToSchoolDetailsList(schools);
+            log.debug("Successfully fetched unassigned schools");
+            return SchoolsResponse.builder().schools(schoolDetails).build();
+        } catch (Exception e) {
+            log.error("Error occurred while fetching unassigned schools from db for project id : {} ", projectId, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
 }

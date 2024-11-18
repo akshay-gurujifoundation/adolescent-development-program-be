@@ -31,4 +31,8 @@ public interface ProjectService {
     ResponseMessage assignStudentToProject(Long id, ProjectStudentAssignUnAssignRequest projectStudentAssignUnAssignRequest);
 
     ResponseMessage unAssignStudentToProject(Long id, ProjectStudentAssignUnAssignRequest projectStudentAssignUnAssignRequest);
+
+    ResponseMessage deleteSchoolProjectMapping(Long id, Long schoolId);
+
+    ResponseMessage updateSchoolProjectMapping(Long id, Long schoolId, ProjectSchoolMappingUpdateRequest projectSchoolMappingUpdateRequest);
 }

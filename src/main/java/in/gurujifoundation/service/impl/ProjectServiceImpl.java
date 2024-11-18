@@ -15,8 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -263,6 +264,34 @@ public class ProjectServiceImpl implements ProjectService {
             return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_UN_ASSIGNED_STUDENT_TO_PROJECT).build();
         } catch (Exception e) {
             log.error("Error occurred while associated student to project for id: {}", id, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
+
+    @Override
+    public ResponseMessage deleteSchoolProjectMapping(Long id, Long schoolId) {
+        try {
+            return schoolProjectMappingService.deleteSchoolProjectMapping(id, schoolId);
+        } catch (Exception e) {
+            log.error("Error occurred while deleting school project mapping for project id: {} and school id : {}", id, schoolId, e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+    }
+
+    @Override
+    public ResponseMessage updateSchoolProjectMapping(Long id, Long schoolId, ProjectSchoolMappingUpdateRequest projectSchoolMappingUpdateRequest) {
+        try {
+            SchoolProjectMapping schoolProjectMapping = schoolProjectMappingService.getSchoolProjectMapping(id, schoolId);
+            schoolProjectMapping.setStartDate(projectSchoolMappingUpdateRequest.getStartDate());
+            schoolProjectMapping.setEndDate(projectSchoolMappingUpdateRequest.getEndDate());
+            schoolProjectMapping.setActualStartDate(projectSchoolMappingUpdateRequest.getActualStartDate());
+            schoolProjectMapping.setActualEndDate(projectSchoolMappingUpdateRequest.getActualEndDate());
+            Teacher teacher = teacherService.getTeacher(projectSchoolMappingUpdateRequest.getTeacherId());
+            schoolProjectMapping.setTeacher(teacher);
+            schoolProjectMappingService.save(schoolProjectMapping);
+            return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_UPDATED_SCHOOL_PROJECT_MAPPING).build();
+        } catch (Exception e) {
+            log.error("Error occurred while updating school project mapping for project id: {} and school id : {}", id, schoolId, e);
             throw new InternalServerException("Unexpected error occurred");
         }
     }

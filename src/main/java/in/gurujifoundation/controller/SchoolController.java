@@ -114,6 +114,25 @@ public class SchoolController {
     }
 
     @Operation(
+            summary = "Get all unassign schools from project",
+            description = "Endpoint to retrieve unassign schools from project",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Schools retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = SchoolsResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @GetMapping("/projects/un-assign")
+    public ResponseEntity<?> getUnAssignSchoolsForProject(@RequestParam Long projectId) {
+        SchoolsResponse schoolsResponse = schoolService.getUnAssignSchoolsForProject(projectId);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(schoolsResponse).build());
+    }
+
+    @Operation(
             summary = "Delete school by id",
             description = "Endpoint to delete school by id",
             security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}

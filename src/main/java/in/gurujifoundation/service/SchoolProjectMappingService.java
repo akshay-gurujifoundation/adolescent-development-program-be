@@ -2,6 +2,7 @@ package in.gurujifoundation.service;
 
 import in.gurujifoundation.domain.*;
 import in.gurujifoundation.request.ProjectAssignRequest;
+import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.response.SchoolProjectMappingDetails;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -19,4 +20,6 @@ public interface SchoolProjectMappingService {
     void save(SchoolProjectMapping schoolProjectMapping);
 
     void deleteSchoolProjectMappings(Set<SchoolProjectMapping> schoolProjects);
+
+    ResponseMessage deleteSchoolProjectMapping(Long id, Long schoolId);
 }

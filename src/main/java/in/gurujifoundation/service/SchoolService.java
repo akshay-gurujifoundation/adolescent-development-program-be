@@ -18,4 +18,6 @@ public interface SchoolService {
     School getSchool(Long schoolId);
 
     ResponseMessage deleteSchool(Long id);
+
+    SchoolsResponse getUnAssignSchoolsForProject(Long projectId);
 }

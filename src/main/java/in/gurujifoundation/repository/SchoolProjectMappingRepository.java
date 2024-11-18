@@ -15,4 +15,6 @@ public interface SchoolProjectMappingRepository extends JpaRepository<SchoolProj
     List<SchoolProjectMapping> findBySchoolId(Long schoolId);
 
     Optional<SchoolProjectMapping> findByProjectIdAndSchoolId(Long id, Long schoolId);
+
+    void deleteByProjectIdAndSchoolId(Long projectId, Long schoolId);
 }

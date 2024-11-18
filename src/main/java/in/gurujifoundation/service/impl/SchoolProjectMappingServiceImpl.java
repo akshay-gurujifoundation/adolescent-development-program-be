@@ -1,11 +1,13 @@
 package in.gurujifoundation.service.impl;
 
+import in.gurujifoundation.constants.ErrorCodeConstant;
 import in.gurujifoundation.domain.*;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.SchoolProjectMappingMapper;
 import in.gurujifoundation.repository.SchoolProjectMappingRepository;
 import in.gurujifoundation.request.ProjectAssignRequest;
+import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.response.SchoolProjectMappingDetails;
 import in.gurujifoundation.service.SchoolProjectMappingService;
 import lombok.extern.slf4j.Slf4j;
@@ -69,5 +71,11 @@ public class SchoolProjectMappingServiceImpl implements SchoolProjectMappingServ
     @Override
     public void deleteSchoolProjectMappings(Set<SchoolProjectMapping> schoolProjects) {
         schoolProjectMappingRepository.deleteAll(schoolProjects);
+    }
+
+    @Override
+    public ResponseMessage deleteSchoolProjectMapping(Long projectId, Long schoolId) {
+        schoolProjectMappingRepository.deleteByProjectIdAndSchoolId(projectId, schoolId);
+        return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_DELETED_SCHOOL_PROJECT_MAPPING).build();
     }
 }

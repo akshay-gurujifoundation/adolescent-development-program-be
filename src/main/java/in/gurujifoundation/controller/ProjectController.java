@@ -223,4 +223,42 @@ public class ProjectController {
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
     }
 
+    @Operation(
+            summary = "Delete school project mapping",
+            description = "Endpoint to delete school project mapping",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Deleted school project mapping successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @DeleteMapping("/{id}/schools")
+    public ResponseEntity<?> deleteSchoolProjectMapping(@PathVariable Long id, @RequestParam Long schoolId) {
+        ResponseMessage responseMessage = projectService.deleteSchoolProjectMapping(id, schoolId);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
+    @Operation(
+            summary = "Update school project mapping",
+            description = "Endpoint to update school project mapping",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Updated school project mapping successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseMessage.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @PutMapping("/{id}/schools")
+    public ResponseEntity<?> updateSchoolProjectMapping(@PathVariable Long id, @RequestParam Long schoolId, @RequestBody ProjectSchoolMappingUpdateRequest projectSchoolMappingUpdateRequest) {
+        ResponseMessage responseMessage = projectService.updateSchoolProjectMapping(id, schoolId, projectSchoolMappingUpdateRequest);
+        return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
 }
