@@ -9,9 +9,7 @@ import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.PerformanceMapper;
 import in.gurujifoundation.repository.PerformanceRepository;
 import in.gurujifoundation.request.CreateOrUpdatePerformanceRequest;
-import in.gurujifoundation.response.PerformanceDetails;
-import in.gurujifoundation.response.PerformanceResponse;
-import in.gurujifoundation.response.ResponseMessage;
+import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.PerformanceService;
 import in.gurujifoundation.service.StudentService;
 import in.gurujifoundation.service.TopicService;
@@ -19,7 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -109,6 +109,21 @@ public class PerformanceServiceImpl implements PerformanceService {
     }
 
     @Override
+    public StudentPerformanceResponse getPerformancesBySchoolAndProject(Long schoolId, Long projectId) {
+        List<Performance> performances = performanceRepository.findBySchoolIdAndProjectId(schoolId, projectId);
+
+        // Group by student
+        Map<Student, List<Performance>> groupedByStudent = performances.stream()
+                .collect(Collectors.groupingBy(Performance::getStudent));
+
+        // Map each student to their response
+        List<StudentPerformance> studentPerformances = groupedByStudent.entrySet().stream()
+                .map(entry -> mapToStudentPerformanceResponse(entry.getKey(), entry.getValue()))
+                .toList();
+        return StudentPerformanceResponse.builder().studentPerformances(studentPerformances).build();
+    }
+
+    @Override
     public ResponseMessage deletePerformance(Long id) {
         try {
             log.debug("Started deleting performance with id: {}", id);
@@ -129,5 +144,22 @@ public class PerformanceServiceImpl implements PerformanceService {
             throw new EntityNotFoundException(ErrorCodeConstant.PERFORMANCE_DOES_NOT_EXIST);
         }
         return performanceOptional.get();
+    }
+
+    private StudentPerformance mapToStudentPerformanceResponse(Student student, List<Performance> performances) {
+        List<TopicPerformanceResponse> topics = performances.stream()
+                .map(performance -> TopicPerformanceResponse.builder()
+                        .topicId(performance.getTopic().getId())
+                        .topicName(performance.getTopic().getName())
+                        .beforeInterventionMark(performance.getBeforeInterventionMark())
+                        .afterInterventionMark(performance.getAfterInterventionMark())
+                        .build())
+                .toList();
+
+        return StudentPerformance.builder()
+                .studentId(student.getId())
+                .studentName(student.getName())
+                .topics(topics)
+                .build();
     }
 }

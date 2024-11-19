@@ -21,4 +21,6 @@ public interface PerformanceService {
     void savePerformances(List<Performance> performanceEntries);
 
     void deleteByStudentIdAndTopicId(Long studentId, Long topicId);
+
+    StudentPerformanceResponse getPerformancesBySchoolAndProject(Long schoolId, Long projectId);
 }
