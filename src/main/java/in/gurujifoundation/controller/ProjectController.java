@@ -161,7 +161,7 @@ public class ProjectController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
     @GetMapping("/schools")
-    public ResponseEntity<?> getProjectSchoolMapping(@RequestParam Long schoolId) {
+    public ResponseEntity<?> getProjectSchoolMapping(@RequestParam(required = false) Long schoolId) {
         ProjectSchoolMappingResponse projectSchoolMapping = projectService.getProjectSchoolMapping(schoolId);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(projectSchoolMapping).build());
     }
