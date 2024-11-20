@@ -5,6 +5,7 @@ import in.gurujifoundation.domain.*;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.ProjectMapper;
+import in.gurujifoundation.mapper.SchoolProjectMappingMapper;
 import in.gurujifoundation.mapper.TopicMapper;
 import in.gurujifoundation.repository.ProjectRepository;
 import in.gurujifoundation.request.*;
@@ -314,6 +315,12 @@ public class ProjectServiceImpl implements ProjectService {
             log.error("Error occurred while updating school project mapping for project id: {} and school id : {}", id, schoolId, e);
             throw new InternalServerException("Unexpected error occurred");
         }
+    }
+
+    @Override
+    public SchoolProjectMappingDetails getSchoolProjectMapping(Long id, Long schoolId) {
+        SchoolProjectMapping schoolProjectMapping = schoolProjectMappingService.getSchoolProjectMapping(id, schoolId);
+        return SchoolProjectMappingMapper.INSTANCE.mapToSchoolProjectMappingDetails(schoolProjectMapping);
     }
 
 }

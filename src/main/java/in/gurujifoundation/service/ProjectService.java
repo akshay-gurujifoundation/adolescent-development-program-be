@@ -2,10 +2,7 @@ package in.gurujifoundation.service;
 
 import in.gurujifoundation.domain.Project;
 import in.gurujifoundation.request.*;
-import in.gurujifoundation.response.ProjectSchoolMappingResponse;
-import in.gurujifoundation.response.ProjectDetails;
-import in.gurujifoundation.response.ProjectResponse;
-import in.gurujifoundation.response.ResponseMessage;
+import in.gurujifoundation.response.*;
 
 public interface ProjectService {
     ResponseMessage createProject(CreateOrUpdateProjectRequest createOrUpdateProjectRequest);
@@ -35,4 +32,6 @@ public interface ProjectService {
     ResponseMessage deleteSchoolProjectMapping(Long id, Long schoolId);
 
     ResponseMessage updateSchoolProjectMapping(Long id, Long schoolId, ProjectSchoolMappingUpdateRequest projectSchoolMappingUpdateRequest);
+
+    SchoolProjectMappingDetails getSchoolProjectMapping(Long id, Long schoolId);
 }
