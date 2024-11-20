@@ -30,4 +30,17 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             ")", nativeQuery = true)
     List<Performance> findBySchoolIdAndProjectId(@Param("schoolId") Long schoolId, @Param("projectId") Long projectId);
 
+    @Query(value = "SELECT p.* " +
+            "FROM performance p " +
+            "INNER JOIN school_project_student_mapping spsm ON p.student_id = spsm.student_id " +
+            "INNER JOIN school_project_mapping spm ON spsm.school_project_id = spm.id " +
+            "WHERE spm.school_id = :schoolId AND spm.project_id = :projectId " +
+            "AND p.student_id IN :studentIds",
+            nativeQuery = true)
+    List<Performance> findBySchoolProjectAndStudents(
+            @Param("schoolId") Long schoolId,
+            @Param("projectId") Long projectId,
+            @Param("studentIds") List<Long> studentIds);
+
+
 }

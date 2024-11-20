@@ -39,4 +39,5 @@ public interface ErrorCodeConstant {
     String SUCCESSFULLY_UN_ASSIGNED_STUDENT_TO_PROJECT = "Successfully un-assigned student to project";
     String SUCCESSFULLY_DELETED_SCHOOL_PROJECT_MAPPING = "Successfully deleted school project mapping.";
     String SUCCESSFULLY_UPDATED_SCHOOL_PROJECT_MAPPING = "Successfully updated school project mapping.";
+    String SUCCESSFULLY_UPDATED_PERFORMANCES = "Successfully updated performances.";
 }

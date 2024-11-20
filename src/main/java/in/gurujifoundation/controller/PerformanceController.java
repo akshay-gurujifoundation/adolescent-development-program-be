@@ -149,4 +149,25 @@ public class PerformanceController {
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(studentPerformanceResponse).build());
     }
 
+
+    @Operation(
+            summary = "Get student performance by school and project id performances",
+            description = "Endpoint to retrieve performances by school and project ids",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Performances retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentPerformanceResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @PutMapping("/students")
+    public ResponseEntity<?> updatePerformances( @RequestParam Long schoolId, @RequestParam Long projectId, @RequestBody StudentPerformanceResponse updatedPerformanceRequest) {
+        ResponseMessage responseMessage = performanceService.updatePerformances(schoolId, projectId, updatedPerformanceRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
 }

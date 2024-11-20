@@ -23,4 +23,6 @@ public interface PerformanceService {
     void deleteByStudentIdAndTopicId(Long studentId, Long topicId);
 
     StudentPerformanceResponse getPerformancesBySchoolAndProject(Long schoolId, Long projectId);
+
+    ResponseMessage updatePerformances(Long schoolId, Long projectId, StudentPerformanceResponse updatedPerformanceRequest);
 }

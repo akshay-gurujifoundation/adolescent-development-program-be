@@ -16,6 +16,7 @@ import in.gurujifoundation.service.TopicService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -122,6 +123,72 @@ public class PerformanceServiceImpl implements PerformanceService {
                 .toList();
         return StudentPerformanceResponse.builder().studentPerformances(studentPerformances).build();
     }
+
+    @Override
+    public ResponseMessage updatePerformances(Long schoolId, Long projectId, StudentPerformanceResponse updatedPerformanceRequest) {
+        try {
+            // Step 1: Extract student IDs from the updated request
+            List<Long> studentIds = updatedPerformanceRequest.getStudentPerformances().stream()
+                    .map(StudentPerformance::getStudentId)
+                    .toList();
+
+            // Step 2: Retrieve existing performances for the provided school, project, and students
+            List<Performance> existingPerformances = performanceRepository.findBySchoolProjectAndStudents(schoolId, projectId, studentIds);
+
+            // Step 3: Map performances by student ID and topic ID for quick access
+            Map<Long, Map<Long, Performance>> performanceMap = existingPerformances.stream()
+                    .collect(Collectors.groupingBy(
+                            p -> p.getStudent().getId(),
+                            Collectors.toMap(p -> p.getTopic().getId(), p -> p)
+                    ));
+
+            // Step 4: Iterate through the request to update the marks
+            for (StudentPerformance studentPerformance : updatedPerformanceRequest.getStudentPerformances()) {
+                Map<Long, Performance> studentPerformanceMap = performanceMap.get(studentPerformance.getStudentId());
+
+                if (studentPerformanceMap == null) {
+                    log.warn("No performance records found for student ID: {}", studentPerformance.getStudentId());
+                    continue; // Skip to the next student
+                }
+
+                for (TopicPerformanceResponse topicPerformance : studentPerformance.getTopics()) {
+                    Performance performance = studentPerformanceMap.get(topicPerformance.getTopicId());
+
+                    if (performance != null) {
+                        try {
+                            // Update marks as per the provided data
+                            if (topicPerformance.getBeforeInterventionMark() != null) {
+                                performance.setBeforeInterventionMark(topicPerformance.getBeforeInterventionMark());
+                            }
+                            if (topicPerformance.getAfterInterventionMark() != null) {
+                                performance.setAfterInterventionMark(topicPerformance.getAfterInterventionMark());
+                            }
+                        } catch (Exception e) {
+                            log.error("Error updating performance for student ID: {}, topic ID: {}. Skipping this entry.",
+                                    studentPerformance.getStudentId(), topicPerformance.getTopicId(), e);
+                            // Swallow the exception and continue with the next topic
+                        }
+                    } else {
+                        log.warn("Performance record not found for topic ID: {} and student ID: {}. Skipping.",
+                                topicPerformance.getTopicId(), studentPerformance.getStudentId());
+                    }
+                }
+            }
+
+            // Step 5: Save all updated performances
+            performanceRepository.saveAll(existingPerformances);
+
+            // Step 6: Return success message
+            return ResponseMessage.builder()
+                    .message(ErrorCodeConstant.SUCCESSFULLY_UPDATED_PERFORMANCES)
+                    .build();
+        } catch (Exception e) {
+            log.error("Unexpected error occurred while updating performances for schoolId: {}, projectId: {}", schoolId, projectId, e);
+            throw new InternalServerException("Unexpected error occurred while updating performances.");
+        }
+    }
+
+
 
     @Override
     public ResponseMessage deletePerformance(Long id) {
