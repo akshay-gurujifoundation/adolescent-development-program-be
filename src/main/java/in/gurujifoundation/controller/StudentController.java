@@ -13,13 +13,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/students")
@@ -171,6 +178,26 @@ public class StudentController {
     public ResponseEntity<?> getStudentsInSchoolProject(@RequestParam(value = "projectId") Long projectId, @RequestParam(value = "schoolId") Long schoolId) {
         StudentsResponse studentsResponse = studentService.getStudentsInSchoolProject(projectId, schoolId);
         return ResponseEntity.ok(APIResponse.builder().status(Boolean.TRUE).data(studentsResponse).build());
+    }
+
+    @Operation(
+            summary = "Get all assigned students of project for school",
+            description = "Endpoint to retrieve assigned students of project for school",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "students retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentsResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @GetMapping(value = "/download")
+    public ResponseEntity<?> getStudentExcelBySchoolId(@RequestParam Long schoolId) {
+        Pair<HttpHeaders, InputStreamResource> candidateResultCsvHeaderPair = studentService.getStudentExcelBySchoolId(schoolId);
+        return new ResponseEntity<>(candidateResultCsvHeaderPair.getValue(), candidateResultCsvHeaderPair.getKey(), HttpStatus.OK);
+
     }
 
 }

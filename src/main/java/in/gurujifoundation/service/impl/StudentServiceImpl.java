@@ -15,10 +15,14 @@ import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.response.SchoolDetails;
 import in.gurujifoundation.response.StudentDetails;
 import in.gurujifoundation.response.StudentsResponse;
+import in.gurujifoundation.service.ExcelService;
 import in.gurujifoundation.service.SchoolService;
 import in.gurujifoundation.service.StudentService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,11 +39,14 @@ public class StudentServiceImpl implements StudentService {
 
     private final SchoolService schoolService;
 
+    private final ExcelService excelService;
+
     @Autowired
-    public StudentServiceImpl(StudentRepository studentRepository, ParentRepository parentRepository, SchoolService schoolService) {
+    public StudentServiceImpl(StudentRepository studentRepository, ParentRepository parentRepository, SchoolService schoolService, ExcelService excelService) {
         this.studentRepository = studentRepository;
         this.parentRepository = parentRepository;
         this.schoolService = schoolService;
+        this.excelService = excelService;
     }
 
     @Override
@@ -160,5 +167,13 @@ public class StudentServiceImpl implements StudentService {
             log.error("Error occurred while fetching student which are assigned to project with id: {} for school Id {}", projectId, schoolId, e);
             throw new InternalServerException("Unexpected error occurred");
         }
+    }
+
+    @Override
+    public Pair<HttpHeaders, InputStreamResource> getStudentExcelBySchoolId(Long schoolId) {
+        School school = schoolService.getSchool(schoolId);
+        List<Student> students = studentRepository.findAllBySchoolId(schoolId);
+        return excelService.createStudentExcelFile(students, school);
+
     }
 }

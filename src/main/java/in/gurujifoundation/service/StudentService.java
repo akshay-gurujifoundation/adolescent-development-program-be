@@ -5,6 +5,9 @@ import in.gurujifoundation.request.CreateOrUpdateStudentRequest;
 import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.response.StudentDetails;
 import in.gurujifoundation.response.StudentsResponse;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 
 import java.util.List;
 import java.util.Set;
@@ -29,4 +32,6 @@ public interface StudentService {
     StudentsResponse getStudentsNotInSchoolProject(Long projectId, Long schoolId);
 
     StudentsResponse getStudentsInSchoolProject(Long projectId, Long schoolId);
+
+    Pair<HttpHeaders, InputStreamResource> getStudentExcelBySchoolId(Long schoolId);
 }
