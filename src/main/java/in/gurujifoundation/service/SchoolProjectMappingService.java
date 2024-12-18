@@ -15,11 +15,14 @@ public interface SchoolProjectMappingService {
 
     List<SchoolProjectMappingDetails> getAllSchoolProjectMappings(Long schoolId);
 
-    SchoolProjectMapping getSchoolProjectMapping(Long id, @NotEmpty Long schoolId);
+    SchoolProjectMapping getSchoolProjectMapping(Long id, Long schoolId);
 
     void save(SchoolProjectMapping schoolProjectMapping);
 
     void deleteSchoolProjectMappings(Set<SchoolProjectMapping> schoolProjects);
 
     ResponseMessage deleteSchoolProjectMapping(Long id, Long schoolId);
+
+    List<SchoolProjectMapping> getAllSchoolProjectMappings();
+
 }

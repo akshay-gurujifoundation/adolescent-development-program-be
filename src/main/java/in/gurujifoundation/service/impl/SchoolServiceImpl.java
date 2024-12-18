@@ -123,4 +123,9 @@ public class SchoolServiceImpl implements SchoolService {
             throw new InternalServerException("Unexpected error occurred");
         }
     }
+
+    @Override
+    public List<School> getAllSchools() {
+        return schoolRepository.findAll();
+    }
 }

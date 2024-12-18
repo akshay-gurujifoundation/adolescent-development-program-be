@@ -1,22 +1,20 @@
 package in.gurujifoundation.service.impl;
 
 import in.gurujifoundation.constants.ErrorCodeConstant;
-import in.gurujifoundation.domain.Performance;
-import in.gurujifoundation.domain.Student;
-import in.gurujifoundation.domain.Topic;
+import in.gurujifoundation.domain.*;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.PerformanceMapper;
 import in.gurujifoundation.repository.PerformanceRepository;
 import in.gurujifoundation.request.CreateOrUpdatePerformanceRequest;
 import in.gurujifoundation.response.*;
-import in.gurujifoundation.service.PerformanceService;
-import in.gurujifoundation.service.StudentService;
-import in.gurujifoundation.service.TopicService;
+import in.gurujifoundation.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,10 +30,19 @@ public class PerformanceServiceImpl implements PerformanceService {
 
     private final TopicService topicService;
 
-    public PerformanceServiceImpl(StudentService studentService, PerformanceRepository performanceRepository, TopicService topicService) {
+    private final ExcelService excelService;
+    private final ProjectService projectService;
+    private final SchoolProjectMappingService schoolProjectMappingService;
+    private final SchoolService schoolService;
+
+    public PerformanceServiceImpl(StudentService studentService, PerformanceRepository performanceRepository, TopicService topicService, ExcelService excelService, ProjectService projectService, SchoolProjectMappingService schoolProjectMappingService, SchoolService schoolService) {
         this.studentService = studentService;
         this.performanceRepository = performanceRepository;
         this.topicService = topicService;
+        this.excelService = excelService;
+        this.projectService = projectService;
+        this.schoolProjectMappingService = schoolProjectMappingService;
+        this.schoolService = schoolService;
     }
 
     @Override
@@ -188,6 +195,13 @@ public class PerformanceServiceImpl implements PerformanceService {
         }
     }
 
+    @Override
+    public Pair<HttpHeaders, InputStreamResource> getStudentPerformanceUploadTemplate() {
+        List<SchoolProjectMapping> schoolProjectMappings = schoolProjectMappingService.getAllSchoolProjectMappings();
+        List<Project> projects = projectService.getAllProjects();
+        List<School> schools = schoolService.getAllSchools();
+        return excelService.createStudentPerformanceUploadTemplate(schoolProjectMappings, projects, schools);
+    }
 
 
     @Override

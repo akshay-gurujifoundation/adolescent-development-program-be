@@ -1,8 +1,7 @@
 package in.gurujifoundation.service.impl;
 
 
-import in.gurujifoundation.domain.School;
-import in.gurujifoundation.domain.Student;
+import in.gurujifoundation.domain.*;
 import in.gurujifoundation.service.ExcelService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -122,5 +121,108 @@ public class ExcelServiceImpl implements ExcelService {
             log.error("Failed to convert the student data to Excel with the following error: {}", ex.getMessage());
             throw new RuntimeException("Failed to generate Excel file", ex);
         }
+    }
+
+    @Override
+    public Pair<HttpHeaders, InputStreamResource> createStudentPerformanceUploadTemplate(List<SchoolProjectMapping> schoolProjectMappings, List<Project> projects, List<School> schools) {
+        try {
+            Workbook workbook = new XSSFWorkbook();
+            addStudentPerformanceSheet(workbook);
+            addSchoolProjectMappingSheet(workbook, schoolProjectMappings);
+            addProjectTopicMappingSheet(workbook, projects);
+            addSchoolStudentMappingSheet(workbook, schools);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
+            workbook.close();
+
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(out.toByteArray());
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=student_performance.xlsx");
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+            return Pair.of(headers, new InputStreamResource(inputStream));
+        } catch (Exception ex) {
+            log.error("Failed to create the Excel template: {}", ex.getMessage());
+            throw new RuntimeException("Failed to generate Excel file", ex);
+        }
+    }
+
+    private void addStudentPerformanceSheet(Workbook workbook) {
+        Sheet sheet = workbook.createSheet("Student Performance");
+        createHeaderRow(sheet, new String[]{"Project Id", "School Id", "Student Id", "Topic Id", "Before Intervention Mark", "After Intervention Mark"});
+    }
+
+    private void addSchoolStudentMappingSheet(Workbook workbook, List<School> schools) {
+        Sheet sheet = workbook.createSheet("School-Student Mapping");
+        createHeaderRow(sheet, new String[]{"School Id", "School Name", "Student Id", "Student Name"});
+        int rowNum = 1;
+        for (School school : schools) {
+            for (Student student : school.getStudents()) {
+                Row row = sheet.createRow(rowNum++);
+                createCell(row, 0, school.getId());
+                createCell(row, 1, school.getName());
+                createCell(row, 2, student.getId());
+                createCell(row, 3, student.getName());
+            }
+        }
+    }
+
+    private void addProjectTopicMappingSheet(Workbook workbook, List<Project> projects) {
+        Sheet sheet = workbook.createSheet("Project-Topic Mapping");
+        createHeaderRow(sheet, new String[]{"Project Id", "Project Name", "Topic Id", "Topic Name"});
+        int rowNum = 1;
+        for (Project project : projects) {
+            for (Topic topic : project.getTopics()) {
+                Row row = sheet.createRow(rowNum++);
+                createCell(row, 0, project.getId());
+                createCell(row, 1, project.getName());
+                createCell(row, 2, topic.getId());
+                createCell(row, 3, topic.getName());
+            }
+        }
+    }
+
+    private void addSchoolProjectMappingSheet(Workbook workbook, List<SchoolProjectMapping> schoolProjectMappings) {
+        Sheet sheet = workbook.createSheet("School-Project Mapping");
+        createHeaderRow(sheet, new String[]{"Project Id", "Project Name", "School Id", "School Name"});
+        int rowNum = 1;
+        for (SchoolProjectMapping mapping : schoolProjectMappings) {
+            Row row = sheet.createRow(rowNum++);
+            createCell(row, 0, mapping.getProject().getId());
+            createCell(row, 1, mapping.getProject().getName());
+            createCell(row, 2, mapping.getSchool().getId());
+            createCell(row, 3, mapping.getSchool().getName());
+        }
+    }
+
+    private void createHeaderRow(Sheet sheet, String[] columnHeaders) {
+        Row headerRow = sheet.createRow(0);
+        CellStyle boldStyle = sheet.getWorkbook().createCellStyle();
+        Font boldFont = sheet.getWorkbook().createFont();
+        boldFont.setBold(true);
+        boldStyle.setFont(boldFont);
+        for (int i = 0; i < columnHeaders.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(columnHeaders[i]);
+            cell.setCellStyle(boldStyle);
+        }
+    }
+
+    private void createCell(Row row, int column, Object value) {
+        Cell cell = row.createCell(column);
+        if (value instanceof Integer) {
+            cell.setCellValue((Integer) value);
+        } else if (value instanceof Double) {
+            cell.setCellValue((Double) value);
+        } else if (value != null) {
+            cell.setCellValue(value.toString());
+        }
+        CellStyle borderedStyle = row.getSheet().getWorkbook().createCellStyle();
+        borderedStyle.setBorderTop(BorderStyle.THIN);
+        borderedStyle.setBorderBottom(BorderStyle.THIN);
+        borderedStyle.setBorderLeft(BorderStyle.THIN);
+        borderedStyle.setBorderRight(BorderStyle.THIN);
+        cell.setCellStyle(borderedStyle);
     }
 }

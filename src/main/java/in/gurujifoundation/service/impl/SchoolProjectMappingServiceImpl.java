@@ -14,10 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -77,5 +74,12 @@ public class SchoolProjectMappingServiceImpl implements SchoolProjectMappingServ
     public ResponseMessage deleteSchoolProjectMapping(Long projectId, Long schoolId) {
         schoolProjectMappingRepository.deleteByProjectIdAndSchoolId(projectId, schoolId);
         return ResponseMessage.builder().message(ErrorCodeConstant.SUCCESSFULLY_DELETED_SCHOOL_PROJECT_MAPPING).build();
+    }
+
+    @Override
+    public List<SchoolProjectMapping> getAllSchoolProjectMappings() {
+        return schoolProjectMappingRepository.findAll().stream()
+                .sorted(Comparator.comparing(spm -> spm.getProject().getName()))
+                .toList();
     }
 }

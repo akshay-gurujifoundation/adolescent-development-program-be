@@ -323,4 +323,9 @@ public class ProjectServiceImpl implements ProjectService {
         return SchoolProjectMappingMapper.INSTANCE.mapToSchoolProjectMappingDetails(schoolProjectMapping);
     }
 
+    @Override
+    public List<Project> getAllProjects() {
+        return projectRepository.findAll();
+    }
+
 }

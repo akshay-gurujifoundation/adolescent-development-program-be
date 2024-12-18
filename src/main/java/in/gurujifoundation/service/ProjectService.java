@@ -4,6 +4,8 @@ import in.gurujifoundation.domain.Project;
 import in.gurujifoundation.request.*;
 import in.gurujifoundation.response.*;
 
+import java.util.List;
+
 public interface ProjectService {
     ResponseMessage createProject(CreateOrUpdateProjectRequest createOrUpdateProjectRequest);
 
@@ -34,4 +36,7 @@ public interface ProjectService {
     ResponseMessage updateSchoolProjectMapping(Long id, Long schoolId, ProjectSchoolMappingUpdateRequest projectSchoolMappingUpdateRequest);
 
     SchoolProjectMappingDetails getSchoolProjectMapping(Long id, Long schoolId);
+
+    List<Project> getAllProjects();
+
 }

@@ -6,6 +6,8 @@ import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.response.SchoolDetails;
 import in.gurujifoundation.response.SchoolsResponse;
 
+import java.util.List;
+
 public interface SchoolService {
     ResponseMessage createSchool(CreateOrUpdateSchoolRequest createSchoolRequest);
 
@@ -20,4 +22,6 @@ public interface SchoolService {
     ResponseMessage deleteSchool(Long id);
 
     SchoolsResponse getUnAssignSchoolsForProject(Long projectId);
+
+    List<School> getAllSchools();
 }

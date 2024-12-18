@@ -11,6 +11,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -168,6 +171,25 @@ public class PerformanceController {
         ResponseMessage responseMessage = performanceService.updatePerformances(schoolId, projectId, updatedPerformanceRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(APIResponse.builder().status(Boolean.TRUE).messages(List.of(responseMessage)).build());
+    }
+
+    @Operation(
+            summary = "Get student performance upload template",
+            description = "Endpoint to retrieve student performance upload template",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "student performance upload template retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentsResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @GetMapping(value = "/download/template")
+    public ResponseEntity<?> getStudentPerformanceUploadTemplate() {
+        Pair<HttpHeaders, InputStreamResource> candidateResultCsvHeaderPair = performanceService.getStudentPerformanceUploadTemplate();
+        return new ResponseEntity<>(candidateResultCsvHeaderPair.getValue(), candidateResultCsvHeaderPair.getKey(), HttpStatus.OK);
     }
 
 }
