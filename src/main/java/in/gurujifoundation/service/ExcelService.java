@@ -1,6 +1,5 @@
 package in.gurujifoundation.service;
 
-import in.gurujifoundation.domain.Project;
 import in.gurujifoundation.domain.School;
 import in.gurujifoundation.domain.SchoolProjectMapping;
 import in.gurujifoundation.domain.Student;
@@ -14,5 +13,5 @@ public interface ExcelService {
 
     Pair<HttpHeaders, InputStreamResource> createStudentExcelFile(List<Student> students, School school);
 
-    Pair<HttpHeaders, InputStreamResource> createStudentPerformanceUploadTemplate(List<SchoolProjectMapping> schoolProjectMappings, List<Project> projects, List<School> schools);
+    Pair<HttpHeaders, InputStreamResource> getStudentPerformanceExcel(SchoolProjectMapping schoolProjectMapping);
 }

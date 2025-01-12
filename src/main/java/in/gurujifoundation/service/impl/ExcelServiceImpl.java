@@ -124,14 +124,36 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     @Override
-    public Pair<HttpHeaders, InputStreamResource> createStudentPerformanceUploadTemplate(List<SchoolProjectMapping> schoolProjectMappings, List<Project> projects, List<School> schools) {
+    public Pair<HttpHeaders, InputStreamResource> getStudentPerformanceExcel(SchoolProjectMapping schoolProjectMapping) {
         try {
             Workbook workbook = new XSSFWorkbook();
-            addStudentPerformanceSheet(workbook);
-            addSchoolProjectMappingSheet(workbook, schoolProjectMappings);
-            addProjectTopicMappingSheet(workbook, projects);
-            addSchoolStudentMappingSheet(workbook, schools);
+            Sheet sheet = workbook.createSheet("Student Performance");
+            createHeaderRow(sheet, new String[]{"Project Id", "Project Name", "School Id", "School Name", "Student Id", "Student Name", "Topic Id", "Topic Name", "Before Intervention Mark", "After Intervention Mark"});
+            int rowIndex = 1;
 
+            for (Student student : schoolProjectMapping.getStudents()) {
+                for (Topic topic : schoolProjectMapping.getProject().getTopics()) {
+                    Row row = sheet.createRow(rowIndex++);
+                    row.createCell(0).setCellValue(schoolProjectMapping.getProject().getId());
+                    row.createCell(1).setCellValue(schoolProjectMapping.getProject().getName());
+                    row.createCell(2).setCellValue(schoolProjectMapping.getSchool().getId());
+                    row.createCell(3).setCellValue(schoolProjectMapping.getSchool().getName());
+                    row.createCell(4).setCellValue(student.getId());
+                    row.createCell(5).setCellValue(student.getName());
+                    row.createCell(6).setCellValue(topic.getId());
+                    row.createCell(7).setCellValue(topic.getName());
+                    Performance performance = topic.getPerformances().stream()
+                            .filter(studentPerformance -> studentPerformance.getStudent().getId().equals(student.getId()) && studentPerformance.getTopic().getId().equals(topic.getId()))
+                            .findFirst()
+                            .orElse(null);
+                    row.createCell(8).setCellValue(performance != null ? performance.getBeforeInterventionMark() : 0);
+                    row.createCell(9).setCellValue(performance != null ? performance.getAfterInterventionMark() : 0);
+                }
+            }
+
+            for (int i = 0; i < 10; i++) {
+                sheet.autoSizeColumn(i);
+            }
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
             workbook.close();
@@ -148,54 +170,6 @@ public class ExcelServiceImpl implements ExcelService {
         }
     }
 
-    private void addStudentPerformanceSheet(Workbook workbook) {
-        Sheet sheet = workbook.createSheet("Student Performance");
-        createHeaderRow(sheet, new String[]{"Project Id", "School Id", "Student Id", "Topic Id", "Before Intervention Mark", "After Intervention Mark"});
-    }
-
-    private void addSchoolStudentMappingSheet(Workbook workbook, List<School> schools) {
-        Sheet sheet = workbook.createSheet("School-Student Mapping");
-        createHeaderRow(sheet, new String[]{"School Id", "School Name", "Student Id", "Student Name"});
-        int rowNum = 1;
-        for (School school : schools) {
-            for (Student student : school.getStudents()) {
-                Row row = sheet.createRow(rowNum++);
-                createCell(row, 0, school.getId());
-                createCell(row, 1, school.getName());
-                createCell(row, 2, student.getId());
-                createCell(row, 3, student.getName());
-            }
-        }
-    }
-
-    private void addProjectTopicMappingSheet(Workbook workbook, List<Project> projects) {
-        Sheet sheet = workbook.createSheet("Project-Topic Mapping");
-        createHeaderRow(sheet, new String[]{"Project Id", "Project Name", "Topic Id", "Topic Name"});
-        int rowNum = 1;
-        for (Project project : projects) {
-            for (Topic topic : project.getTopics()) {
-                Row row = sheet.createRow(rowNum++);
-                createCell(row, 0, project.getId());
-                createCell(row, 1, project.getName());
-                createCell(row, 2, topic.getId());
-                createCell(row, 3, topic.getName());
-            }
-        }
-    }
-
-    private void addSchoolProjectMappingSheet(Workbook workbook, List<SchoolProjectMapping> schoolProjectMappings) {
-        Sheet sheet = workbook.createSheet("School-Project Mapping");
-        createHeaderRow(sheet, new String[]{"Project Id", "Project Name", "School Id", "School Name"});
-        int rowNum = 1;
-        for (SchoolProjectMapping mapping : schoolProjectMappings) {
-            Row row = sheet.createRow(rowNum++);
-            createCell(row, 0, mapping.getProject().getId());
-            createCell(row, 1, mapping.getProject().getName());
-            createCell(row, 2, mapping.getSchool().getId());
-            createCell(row, 3, mapping.getSchool().getName());
-        }
-    }
-
     private void createHeaderRow(Sheet sheet, String[] columnHeaders) {
         Row headerRow = sheet.createRow(0);
         CellStyle boldStyle = sheet.getWorkbook().createCellStyle();
@@ -207,22 +181,5 @@ public class ExcelServiceImpl implements ExcelService {
             cell.setCellValue(columnHeaders[i]);
             cell.setCellStyle(boldStyle);
         }
-    }
-
-    private void createCell(Row row, int column, Object value) {
-        Cell cell = row.createCell(column);
-        if (value instanceof Integer) {
-            cell.setCellValue((Integer) value);
-        } else if (value instanceof Double) {
-            cell.setCellValue((Double) value);
-        } else if (value != null) {
-            cell.setCellValue(value.toString());
-        }
-        CellStyle borderedStyle = row.getSheet().getWorkbook().createCellStyle();
-        borderedStyle.setBorderTop(BorderStyle.THIN);
-        borderedStyle.setBorderBottom(BorderStyle.THIN);
-        borderedStyle.setBorderLeft(BorderStyle.THIN);
-        borderedStyle.setBorderRight(BorderStyle.THIN);
-        cell.setCellStyle(borderedStyle);
     }
 }

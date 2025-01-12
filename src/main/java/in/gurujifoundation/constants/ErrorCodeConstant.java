@@ -40,4 +40,8 @@ public interface ErrorCodeConstant {
     String SUCCESSFULLY_DELETED_SCHOOL_PROJECT_MAPPING = "Successfully deleted school project mapping.";
     String SUCCESSFULLY_UPDATED_SCHOOL_PROJECT_MAPPING = "Successfully updated school project mapping.";
     String SUCCESSFULLY_UPDATED_PERFORMANCES = "Successfully updated performances.";
+    String SCHOOL_ID_CANNOT_BE_NULL = "School Id cannot be null";
+    String PROJECT_ID_CANNOT_BE_NULL = "Project id cannot be null";
+    String TOPIC_IDS_CANNOT_BE_NULL_OR_EMPTY = "Topic ids cannot be null or empty";
+    String PERFORMANCE_NOT_FOUND = "Performance not found";
 }

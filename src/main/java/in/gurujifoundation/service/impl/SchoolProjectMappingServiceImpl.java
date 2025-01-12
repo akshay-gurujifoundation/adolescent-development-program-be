@@ -14,7 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -39,7 +42,7 @@ public class SchoolProjectMappingServiceImpl implements SchoolProjectMappingServ
     }
 
     @Override
-    public List<SchoolProjectMappingDetails> getAllSchoolProjectMappings(Long schoolId) {
+    public List<SchoolProjectMappingDetails> getSchoolProjectMappingsBySchoolId(Long schoolId) {
         List<SchoolProjectMapping> schoolProjectMappings = new ArrayList<>();
         if (schoolId == null) {
             schoolProjectMappings = schoolProjectMappingRepository.findAll();
@@ -77,9 +80,12 @@ public class SchoolProjectMappingServiceImpl implements SchoolProjectMappingServ
     }
 
     @Override
-    public List<SchoolProjectMapping> getAllSchoolProjectMappings() {
-        return schoolProjectMappingRepository.findAll().stream()
-                .sorted(Comparator.comparing(spm -> spm.getProject().getName()))
-                .toList();
+    public SchoolProjectMapping getSchoolProjectMappingBySchoolIdAndProjectId(Long schoolId, Long projectId) {
+        Optional<SchoolProjectMapping> schoolProjectMappingOptional = schoolProjectMappingRepository.findBySchoolIdAndProjectId(schoolId, projectId);
+        if (schoolProjectMappingOptional.isEmpty()) {
+            log.error("School project mapping with id {} not found", schoolId);
+            throw new EntityNotFoundException("School project mapping not found");
+        }
+        return schoolProjectMappingOptional.get();
     }
 }

@@ -1,23 +1,32 @@
 package in.gurujifoundation.service.impl;
 
 import in.gurujifoundation.constants.ErrorCodeConstant;
-import in.gurujifoundation.domain.*;
+import in.gurujifoundation.domain.Performance;
+import in.gurujifoundation.domain.SchoolProjectMapping;
+import in.gurujifoundation.domain.Student;
+import in.gurujifoundation.domain.Topic;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.PerformanceMapper;
 import in.gurujifoundation.repository.PerformanceRepository;
 import in.gurujifoundation.request.CreateOrUpdatePerformanceRequest;
+import in.gurujifoundation.request.StudentPerformanceExcelDownloadRequest;
 import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.*;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.io.InputStream;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -196,11 +205,49 @@ public class PerformanceServiceImpl implements PerformanceService {
     }
 
     @Override
-    public Pair<HttpHeaders, InputStreamResource> getStudentPerformanceUploadTemplate() {
-        List<SchoolProjectMapping> schoolProjectMappings = schoolProjectMappingService.getAllSchoolProjectMappings();
-        List<Project> projects = projectService.getAllProjects();
-        List<School> schools = schoolService.getAllSchools();
-        return excelService.createStudentPerformanceUploadTemplate(schoolProjectMappings, projects, schools);
+    public Pair<HttpHeaders, InputStreamResource> downloadStudentPerformanceExcel(StudentPerformanceExcelDownloadRequest studentPerformanceExcelDownloadRequest) {
+        SchoolProjectMapping schoolProjectMapping = schoolProjectMappingService.getSchoolProjectMappingBySchoolIdAndProjectId(studentPerformanceExcelDownloadRequest.getSchoolId(), studentPerformanceExcelDownloadRequest.getProjectId());
+        schoolProjectMapping.getProject().setTopics(schoolProjectMapping.getProject().getTopics().stream().filter(topic -> studentPerformanceExcelDownloadRequest.getTopicIds().contains(topic.getId())).collect(Collectors.toSet()));
+        return excelService.getStudentPerformanceExcel(schoolProjectMapping);
+    }
+
+    @Override
+    @Transactional
+    public ResponseMessage uploadStudentPerformanceExcel(MultipartFile file) {
+        log.info("Uploading student performance excel file: {}", file.getOriginalFilename());
+        try (InputStream inputStream = file.getInputStream();
+             Workbook workbook = new XSSFWorkbook(inputStream)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rowIterator = sheet.iterator();
+            if (rowIterator.hasNext()) rowIterator.next();
+            List<Performance> performancesToBeUpdated = new ArrayList<>();
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+                Long studentId = (long) row.getCell(4).getNumericCellValue();
+                Long topicId = (long) row.getCell(6).getNumericCellValue();
+                Performance existingPerformance = getPerformanceByStudentIdAndTopicId(studentId, topicId);
+                Float beforeInterventionMark = (float) row.getCell(8).getNumericCellValue();
+                Float afterInterventionMark = (float) row.getCell(9).getNumericCellValue();
+                existingPerformance.setBeforeInterventionMark(beforeInterventionMark);
+                existingPerformance.setAfterInterventionMark(afterInterventionMark);
+                performancesToBeUpdated.add(existingPerformance);
+            }
+            performanceRepository.saveAll(performancesToBeUpdated);
+        } catch (Exception e) {
+            log.error("Unexpected error occurred while uploading student performance excel", e);
+            throw new InternalServerException("Unexpected error occurred");
+        }
+        log.info("Student performance excel uploaded successfully");
+        return ResponseMessage.builder().message(ErrorCodeConstant.PERFORMANCE_UPDATED_SUCCESSFULLY).build();
+    }
+
+    private Performance getPerformanceByStudentIdAndTopicId(Long studentId, Long topicId) {
+        Optional<Performance> performanceOptional = performanceRepository.findByStudentIdAndTopicId(studentId, topicId);
+        if (performanceOptional.isEmpty()) {
+            log.error("Performance found for student id: {} and topic ID: {}", studentId, topicId);
+            throw new EntityNotFoundException(ErrorCodeConstant.PERFORMANCE_NOT_FOUND);
+        }
+        return performanceOptional.get();
     }
 
 

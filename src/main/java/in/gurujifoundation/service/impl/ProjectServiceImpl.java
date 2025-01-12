@@ -201,7 +201,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectSchoolMappingResponse getProjectSchoolMapping(Long schoolId) {
         try {
-            List<SchoolProjectMappingDetails> schoolProjectMappingDetails = schoolProjectMappingService.getAllSchoolProjectMappings(schoolId);
+            List<SchoolProjectMappingDetails> schoolProjectMappingDetails = schoolProjectMappingService.getSchoolProjectMappingsBySchoolId(schoolId);
             return ProjectSchoolMappingResponse.builder().schoolProjects(schoolProjectMappingDetails).build();
         } catch (Exception e) {
             log.error("Error occurred while fetching associated project to school for id: {}", schoolId, e);

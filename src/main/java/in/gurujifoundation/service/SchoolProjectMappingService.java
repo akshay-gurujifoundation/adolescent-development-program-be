@@ -4,7 +4,6 @@ import in.gurujifoundation.domain.*;
 import in.gurujifoundation.request.ProjectAssignRequest;
 import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.response.SchoolProjectMappingDetails;
-import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 import java.util.Set;
@@ -13,7 +12,7 @@ public interface SchoolProjectMappingService {
 
     void saveSchoolProjectMapping(Project project, School school, Teacher teacher, List<Student> studentList, ProjectAssignRequest projectAssignRequest);
 
-    List<SchoolProjectMappingDetails> getAllSchoolProjectMappings(Long schoolId);
+    List<SchoolProjectMappingDetails> getSchoolProjectMappingsBySchoolId(Long schoolId);
 
     SchoolProjectMapping getSchoolProjectMapping(Long id, Long schoolId);
 
@@ -23,6 +22,6 @@ public interface SchoolProjectMappingService {
 
     ResponseMessage deleteSchoolProjectMapping(Long id, Long schoolId);
 
-    List<SchoolProjectMapping> getAllSchoolProjectMappings();
+    SchoolProjectMapping getSchoolProjectMappingBySchoolIdAndProjectId(Long schoolId, Long projectId);
 
 }
