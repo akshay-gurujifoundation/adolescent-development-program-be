@@ -31,6 +31,17 @@ public interface StudentMapper {
     @Mapping(target = "parent", expression = "java(PARENT_MAPPER.toParent(request.getParent()))")
     Student toEntity(CreateOrUpdateStudentRequest request, SchoolDetails school);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "name", source = "request.name")
+    @Mapping(target = "dob", source = "request.dob")
+    @Mapping(target = "address", source = "request.address")
+    @Mapping(target = "phoneNumber", source = "request.phoneNumber")
+    @Mapping(target = "alternativeNumber", source = "request.alternativeNumber")
+    @Mapping(target = "email", source = "request.email")
+    @Mapping(target = "school", source = "school")
+    @Mapping(target = "parent", expression = "java(PARENT_MAPPER.toParent(request.getParent()))")
+    Student createOrUpdateStudentRequestToEntity(CreateOrUpdateStudentRequest request, School school);
+
 
     @Mapping(target = "id", source = "student.id")
     @Mapping(target = "name", source = "student.name")

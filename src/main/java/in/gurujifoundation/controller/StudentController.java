@@ -1,5 +1,6 @@
 package in.gurujifoundation.controller;
 
+import in.gurujifoundation.dto.BulkUploadResponse;
 import in.gurujifoundation.request.CreateOrUpdateStudentRequest;
 import in.gurujifoundation.response.APIResponse;
 import in.gurujifoundation.response.ResponseMessage;
@@ -7,32 +8,35 @@ import in.gurujifoundation.response.StudentDetails;
 import in.gurujifoundation.response.StudentsResponse;
 import in.gurujifoundation.service.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/students")
 @Tag(name = "Student")
+@Slf4j
 public class StudentController {
 
     private final StudentService studentService;
@@ -201,6 +205,65 @@ public class StudentController {
         Pair<HttpHeaders, InputStreamResource> candidateResultCsvHeaderPair = studentService.getStudentExcelBySchoolId(schoolId);
         return new ResponseEntity<>(candidateResultCsvHeaderPair.getValue(), candidateResultCsvHeaderPair.getKey(), HttpStatus.OK);
 
+    }
+
+    @Operation(
+            summary = "Get upload template for student",
+            description = "Endpoint to retrieve excel file template to upload the students",
+            security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Upload template retrieved successfully",
+                    content = @Content(mediaType = "application/vnd.ms-excel", schema = @Schema(type = "string", format = "binary"))),
+            @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+    })
+    @GetMapping(value = "/download-template")
+    public ResponseEntity<?> getStudentUploadTemplate() {
+        Pair<HttpHeaders, InputStreamResource> candidateResultCsvHeaderPair = studentService.getStudentUploadTemplate();
+        return new ResponseEntity<>(candidateResultCsvHeaderPair.getValue(), candidateResultCsvHeaderPair.getKey(), HttpStatus.OK);
+
+    }
+
+    @Operation(summary = "Upload students via Excel file",
+            description = "Upload multiple students using Excel file format for a specific school")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Students uploaded successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input or file format"),
+            @ApiResponse(responseCode = "404", description = "School not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadStudentExcel( @Parameter(description = "School ID", required = true)
+                                                     @RequestParam @Valid @Positive(message = "School ID must be positive") Long schoolId,
+                                                 @RequestPart MultipartFile file) {
+
+        log.info("Received request to upload students for school ID: {}", schoolId);
+
+        if (!isValidExcelFile(file)) {
+            return ResponseEntity.badRequest()
+                    .body(APIResponse.builder()
+                            .status(false)
+                            .messages(List.of(new ResponseMessage("Invalid file format. Please upload an Excel file (.xlsx)")))
+                            .build());
+        }
+
+        BulkUploadResponse response = studentService.uploadStudentExcel(schoolId, file);
+
+        return ResponseEntity.ok(APIResponse.builder()
+                .status(true)
+                .messages(response.getMessages())
+                .data(response.getStats())
+                .build());
+    }
+
+    private boolean isValidExcelFile(MultipartFile file) {
+        String contentType = file.getContentType();
+        return contentType != null && (
+                contentType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || // .xlsx
+                        contentType.equals("application/vnd.ms-excel")); // .xls
     }
 
 }

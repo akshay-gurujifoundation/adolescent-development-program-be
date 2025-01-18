@@ -50,7 +50,7 @@ public class Student extends Auditable {
     @Column(name = "alternative_number")
     private String alternativeNumber;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email")
     private String email;
 
 }
