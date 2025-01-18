@@ -178,12 +178,12 @@ public class PerformanceController {
     }
 
     @Operation(
-            summary = "Get student performance upload template",
-            description = "Endpoint to retrieve student performance upload template",
+            summary = "Download student performance excel",
+            description = "Endpoint to download student performance excel",
             security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "student performance upload template retrieved successfully",
+            @ApiResponse(responseCode = "200", description = "Student performance excel downloaded successfully",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentsResponse.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
@@ -197,12 +197,12 @@ public class PerformanceController {
     }
 
     @Operation(
-            summary = "Get student performance upload template",
-            description = "Endpoint to retrieve student performance upload template",
+            summary = "Upload student performance excel",
+            description = "Endpoint to upload student performance excel",
             security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "OAuth Flow")}
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "student performance upload template retrieved successfully",
+            @ApiResponse(responseCode = "200", description = "Student performance excel uploaded successfully",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentsResponse.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content(mediaType = "application/json")),
