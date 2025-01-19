@@ -173,7 +173,7 @@ public class SchoolController {
             @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
     })
-    @GetMapping(value = "/download-school-template")
+    @GetMapping(value = "/download-template")
     public ResponseEntity<?> getSchoolUploadTemplate() {
         Pair<HttpHeaders, InputStreamResource> schoolTemplateResult = schoolService.getSchoolUploadTemplate();
         return new ResponseEntity<>(schoolTemplateResult.getValue(), schoolTemplateResult.getKey(), HttpStatus.OK);
@@ -186,7 +186,7 @@ public class SchoolController {
             @ApiResponse(responseCode = "400", description = "Invalid input or file format"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @PostMapping(value = "/upload-schools", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadSchoolExcel(@RequestPart MultipartFile file) {
 
         log.info("Received request to upload schools");
