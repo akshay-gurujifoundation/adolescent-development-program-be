@@ -18,8 +18,9 @@ import in.gurujifoundation.response.*;
 import in.gurujifoundation.service.ExcelService;
 import in.gurujifoundation.service.SchoolService;
 import in.gurujifoundation.service.StudentService;
+import in.gurujifoundation.utils.ExcelUtils;
+import in.gurujifoundation.validator.StudentValidator;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -32,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -271,7 +271,7 @@ public class StudentServiceImpl implements StudentService {
                     CreateOrUpdateStudentRequest createOrUpdateStudentRequest = extractStudentFromRow(row);
                     String studentName = createOrUpdateStudentRequest.getName();
                     
-                    if (validateStudent(createOrUpdateStudentRequest, messages, rowNum)) {
+                    if (StudentValidator.validateStudent(createOrUpdateStudentRequest, messages, rowNum)) {
                         Student student = StudentMapper.INSTANCE.createOrUpdateStudentRequestToEntity(createOrUpdateStudentRequest, school);
                         Parent parent = student.getParent();
                         validParents.add(parent);
@@ -289,7 +289,7 @@ public class StudentServiceImpl implements StudentService {
                     log.error("Error processing row {}: {}", rowNum, e.getMessage());
                     messages.add(new ResponseMessage("Error in row " + rowNum + ": " + e.getMessage()));
                     stats.incrementFailureCount();
-                    String studentName = getCellValueAsString(row.getCell(0));
+                    String studentName = ExcelUtils.getCellValueAsString(row.getCell(0));
                     failedStudents.add(studentName != null ? studentName : "Row " + rowNum + " (No Name)");
                 }
                 rowNum++;
@@ -307,91 +307,23 @@ public class StudentServiceImpl implements StudentService {
             throw new InternalServerException("Failed to process Excel file: " + e.getMessage());
         }
 
-        stats.setFailedStudents(failedStudents);
+        stats.setFailedItems(failedStudents);
         return new BulkUploadResponse(messages, stats);
     }
 
     private CreateOrUpdateStudentRequest extractStudentFromRow(Row row) {
         CreateOrUpdateParentRequest createOrUpdateParentRequest = CreateOrUpdateParentRequest.builder()
-                .name(getCellValueAsString(row.getCell(5)))
-                .occupation(getCellValueAsString(row.getCell(6)))
-                .phoneNumber(getCellValueAsString(row.getCell(7)))
+                .name(ExcelUtils.getCellValueAsString(row.getCell(5)))
+                .occupation(ExcelUtils.getCellValueAsString(row.getCell(6)))
+                .phoneNumber(ExcelUtils.getCellValueAsString(row.getCell(7)))
                 .build();
         return CreateOrUpdateStudentRequest.builder()
-                .name(getCellValueAsString(row.getCell(0)))
-                .dob(getCellValueAsDate(row.getCell(1)))
-                .address(getCellValueAsString(row.getCell(2)))
-                .phoneNumber(getCellValueAsString(row.getCell(3)))
-                .alternativeNumber(getCellValueAsString(row.getCell(4)))
+                .name(ExcelUtils.getCellValueAsString(row.getCell(0)))
+                .dob(ExcelUtils.getCellValueAsDate(row.getCell(1)))
+                .address(ExcelUtils.getCellValueAsString(row.getCell(2)))
+                .phoneNumber(ExcelUtils.getCellValueAsString(row.getCell(3)))
+                .alternativeNumber(ExcelUtils.getCellValueAsString(row.getCell(4)))
                 .parent(createOrUpdateParentRequest)
                 .build();
-    }
-
-    private String getCellValueAsString(Cell cell) {
-        if (cell == null) return null;
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue();
-            case NUMERIC -> String.valueOf((long) cell.getNumericCellValue());
-            default -> null;
-        };
-    }
-
-    private LocalDate getCellValueAsDate(Cell cell) {
-        if (cell == null) return null;
-        try {
-            if (cell.getCellType() == CellType.NUMERIC) {
-                return cell.getLocalDateTimeCellValue().toLocalDate();
-            }
-            return LocalDate.parse(cell.getStringCellValue());
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private boolean validateStudent(CreateOrUpdateStudentRequest createOrUpdateStudentRequest, List<ResponseMessage> messages, int rowNum) {
-        List<String> errors = new ArrayList<>();
-
-        // Student validations
-        if (StringUtils.isBlank(createOrUpdateStudentRequest.getName())) {
-            errors.add("Student name is required");
-        }
-        
-        // Date of birth validations
-        if (createOrUpdateStudentRequest.getDob() == null) {
-            errors.add("Date of birth is required");
-        } else if (createOrUpdateStudentRequest.getDob().isEqual(LocalDate.now()) || 
-                   createOrUpdateStudentRequest.getDob().isAfter(LocalDate.now())) {
-            errors.add("Date of birth cannot be current or future date");
-        }
-        
-        if (StringUtils.isBlank(createOrUpdateStudentRequest.getAddress())) {
-            errors.add("Address is required");
-        }
-        // Optional phone number validation
-        if (StringUtils.isNotBlank(createOrUpdateStudentRequest.getPhoneNumber()) 
-                && !createOrUpdateStudentRequest.getPhoneNumber().matches("\\d{10}")) {
-            errors.add("Invalid student phone number format");
-        }
-
-        // Parent validations
-        CreateOrUpdateParentRequest parent = createOrUpdateStudentRequest.getParent();
-        if (parent == null) {
-            errors.add("Parent information is required");
-        } else {
-            if (StringUtils.isBlank(parent.getName())) {
-                errors.add("Parent name is required");
-            }
-            if (StringUtils.isBlank(parent.getPhoneNumber())) {
-                errors.add("Parent phone number is required");
-            } else if (!parent.getPhoneNumber().matches("\\d{10}")) {
-                errors.add("Invalid parent phone number format");
-            }
-        }
-
-        if (!errors.isEmpty()) {
-            messages.add(new ResponseMessage("Row " + rowNum + ": " + String.join(", ", errors)));
-            return false;
-        }
-        return true;
     }
 }

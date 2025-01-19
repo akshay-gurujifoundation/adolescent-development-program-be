@@ -2,6 +2,8 @@ package in.gurujifoundation.service.impl;
 
 import in.gurujifoundation.constants.ErrorCodeConstant;
 import in.gurujifoundation.domain.School;
+import in.gurujifoundation.dto.BulkUploadResponse;
+import in.gurujifoundation.dto.UploadStats;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.SchoolMapper;
@@ -11,10 +13,22 @@ import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.response.SchoolDetails;
 import in.gurujifoundation.response.SchoolsResponse;
 import in.gurujifoundation.service.SchoolService;
+import in.gurujifoundation.utils.ExcelUtils;
+import in.gurujifoundation.validator.SchoolValidator;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,5 +141,137 @@ public class SchoolServiceImpl implements SchoolService {
     @Override
     public List<School> getAllSchools() {
         return schoolRepository.findAll();
+    }
+
+    /**
+     * Generates an Excel template for school data upload.
+     * The template includes columns for school and management information.
+     *
+     * @return A Pair containing HTTP headers and the Excel template as an InputStreamResource
+     * @throws InternalServerException if there's an error generating the template
+     */
+    @Override
+    public Pair<HttpHeaders, InputStreamResource> getSchoolUploadTemplate() {
+        log.debug("Starting to generate school upload template");
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("School Template");
+
+            // Define header row
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {
+                    "School Name", "School Address", "Phone Number", "Principal Name",
+                    "Principal Contact Number", "Managing Trustee", "Trustee Contact Info", "Website"
+            };
+
+            // Create header cells
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                CellStyle style = workbook.createCellStyle();
+                Font font = workbook.createFont();
+                font.setBold(true);
+                style.setFont(font);
+                cell.setCellStyle(style);
+            }
+
+            // Autosize columns
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Write the workbook to a byte array
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
+
+            // Create HTTP headers
+            HttpHeaders headersResponse = new HttpHeaders();
+            headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=School_Template.xlsx");
+            headersResponse.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+            log.debug("Successfully generated school upload template");
+            return Pair.of(headersResponse, new InputStreamResource(new ByteArrayInputStream(out.toByteArray())));
+        } catch (IOException e) {
+            log.error("IO error occurred while generating school upload template", e);
+            throw new InternalServerException("Failed to generate Excel template due to IO error", e);
+        } catch (Exception e) {
+            log.error("Unexpected error occurred while generating school upload template", e);
+            throw new InternalServerException("Failed to generate Excel template", e);
+        }
+    }
+
+    @Override
+    public BulkUploadResponse uploadSchoolExcel(MultipartFile file) {
+        log.info("Processing school upload.");
+
+        List<ResponseMessage> messages = new ArrayList<>();
+        UploadStats stats = new UploadStats();
+        List<String> failedSchools = new ArrayList<>();
+
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            // Skip header row
+            int rowNum = 1;
+            List<School> validSchools = new ArrayList<>();
+
+            while (rowNum <= sheet.getLastRowNum()) {
+                Row row = sheet.getRow(rowNum);
+                if (row == null) {
+                    rowNum++;
+                    continue;
+                }
+
+                try {
+                    CreateOrUpdateSchoolRequest createOrUpdateSchoolRequest = extractSchoolFromRow(row);
+                    String schoolName = createOrUpdateSchoolRequest.getName();
+
+                    if (SchoolValidator.validateSchool(createOrUpdateSchoolRequest, messages, rowNum)) {
+                        School school = SchoolMapper.INSTANCE.mapToEntity(createOrUpdateSchoolRequest);
+                        validSchools.add(school);
+                        stats.incrementSuccessCount();
+                    } else {
+                        stats.incrementFailureCount();
+                        if (schoolName != null && !schoolName.trim().isEmpty()) {
+                            failedSchools.add(schoolName);
+                        } else {
+                            failedSchools.add("Row " + rowNum + " (No Name)");
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("Error processing row {}: {}", rowNum, e.getMessage());
+                    messages.add(new ResponseMessage("Error in row " + rowNum + ": " + e.getMessage()));
+                    stats.incrementFailureCount();
+                    String schoolName = ExcelUtils.getCellValueAsString(row.getCell(0));
+                    failedSchools.add(schoolName != null ? schoolName : "Row " + rowNum + " (No Name)");
+                }
+                rowNum++;
+            }
+
+            // Batch save schools
+            if (!validSchools.isEmpty()) {
+                schoolRepository.saveAll(validSchools);
+                log.info("Successfully saved {} schools.", validSchools.size());
+            }
+
+        } catch (IOException e) {
+            log.error("Failed to process Excel file", e);
+            throw new InternalServerException("Failed to process Excel file: " + e.getMessage());
+        }
+
+        stats.setFailedItems(failedSchools);
+        return new BulkUploadResponse(messages, stats);
+    }
+
+    private CreateOrUpdateSchoolRequest extractSchoolFromRow(Row row) {
+        return CreateOrUpdateSchoolRequest.builder()
+                .name(ExcelUtils.getCellValueAsString(row.getCell(0)))
+                .address(ExcelUtils.getCellValueAsString(row.getCell(1)))
+                .phoneNumber(ExcelUtils.getCellValueAsString(row.getCell(2)))
+                .principalName(ExcelUtils.getCellValueAsString(row.getCell(3)))
+                .principalContactNo(ExcelUtils.getCellValueAsString(row.getCell(4)))
+                .managingTrustee(ExcelUtils.getCellValueAsString(row.getCell(5)))
+                .trusteeContactInfo(ExcelUtils.getCellValueAsString(row.getCell(6)))
+                .website(ExcelUtils.getCellValueAsString(row.getCell(7)))
+                .build();
     }
 }

@@ -9,7 +9,7 @@ public class UploadStats {
     private int successCount = 0;
     private int failureCount = 0;
     private int totalProcessed = 0;
-    private List<String> failedStudents = new ArrayList<>();
+    private List<String> failedItems = new ArrayList<>();
 
     public void incrementSuccessCount() {
         successCount++;

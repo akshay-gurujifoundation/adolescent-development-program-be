@@ -7,6 +7,7 @@ import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.response.StudentDetails;
 import in.gurujifoundation.response.StudentsResponse;
 import in.gurujifoundation.service.StudentService;
+import in.gurujifoundation.utils.ExcelUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -242,7 +243,7 @@ public class StudentController {
 
         log.info("Received request to upload students for school ID: {}", schoolId);
 
-        if (!isValidExcelFile(file)) {
+        if (!ExcelUtils.isValidExcelFile(file)) {
             return ResponseEntity.badRequest()
                     .body(APIResponse.builder()
                             .status(false)
@@ -257,13 +258,6 @@ public class StudentController {
                 .messages(response.getMessages())
                 .data(response.getStats())
                 .build());
-    }
-
-    private boolean isValidExcelFile(MultipartFile file) {
-        String contentType = file.getContentType();
-        return contentType != null && (
-                contentType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || // .xlsx
-                        contentType.equals("application/vnd.ms-excel")); // .xls
     }
 
 }
