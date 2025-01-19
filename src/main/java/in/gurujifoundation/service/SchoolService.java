@@ -33,4 +33,6 @@ public interface SchoolService {
     Pair<HttpHeaders, InputStreamResource> getSchoolUploadTemplate();
 
     BulkUploadResponse uploadSchoolExcel(MultipartFile file);
+
+    Pair<HttpHeaders, InputStreamResource> exportSchools();
 }

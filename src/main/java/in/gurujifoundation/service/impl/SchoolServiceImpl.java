@@ -262,6 +262,70 @@ public class SchoolServiceImpl implements SchoolService {
         return new BulkUploadResponse(messages, stats);
     }
 
+    @Override
+    public Pair<HttpHeaders, InputStreamResource> exportSchools() {
+        List<School> schools = schoolRepository.findAll();
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Schools");
+
+            // Header row
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {
+                    "ID", "Name", "Address", "Phone Number", "Principal Name", "Principal Contact No",
+                    "Managing Trustee", "Trustee Contact Info", "Website", "Total Teachers", "Total Students"
+            };
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(createHeaderCellStyle(workbook));
+            }
+
+            // Data rows
+            int rowIndex = 1;
+            for (School school : schools) {
+                Row row = sheet.createRow(rowIndex++);
+                row.createCell(0).setCellValue(school.getId());
+                row.createCell(1).setCellValue(school.getName());
+                row.createCell(2).setCellValue(school.getAddress());
+                row.createCell(3).setCellValue(school.getPhoneNumber());
+                row.createCell(4).setCellValue(school.getPrincipalName());
+                row.createCell(5).setCellValue(school.getPrincipalContactNo());
+                row.createCell(6).setCellValue(school.getManagingTrustee());
+                row.createCell(7).setCellValue(school.getTrusteeContactInfo());
+                row.createCell(8).setCellValue(school.getWebsite());
+                row.createCell(9).setCellValue(school.getTeachers().size());
+                row.createCell(10).setCellValue(school.getStudents().size());
+            }
+
+            // Auto-size columns
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(out);
+
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(out.toByteArray());
+            InputStreamResource resource = new InputStreamResource(inputStream);
+
+            HttpHeaders headersResponse = new HttpHeaders();
+            headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=schools.xlsx");
+            headersResponse.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+            return Pair.of(headersResponse, resource);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate school upload template", e);
+        }
+    }
+
+    private CellStyle createHeaderCellStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        style.setFont(font);
+        return style;
+    }
+
     private CreateOrUpdateSchoolRequest extractSchoolFromRow(Row row) {
         return CreateOrUpdateSchoolRequest.builder()
                 .name(ExcelUtils.getCellValueAsString(row.getCell(0)))

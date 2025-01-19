@@ -208,4 +208,20 @@ public class SchoolController {
                 .build());
     }
 
+    @Operation(
+            summary = "Export School Data",
+            description = "Generates and downloads an Excel file containing all school data."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "File generated and downloaded successfully",
+                    content = @Content(mediaType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")),
+            @ApiResponse(responseCode = "500", description = "Internal server error while generating the file",
+                    content = @Content(schema = @Schema(hidden = true)))
+    })
+    @GetMapping("/download")
+    public ResponseEntity<?> exportSchools() {
+        Pair<HttpHeaders, InputStreamResource> schoolTemplateResult = schoolService.exportSchools();
+        return new ResponseEntity<>(schoolTemplateResult.getValue(), schoolTemplateResult.getKey(), HttpStatus.OK);
+    }
+
 }
