@@ -131,7 +131,12 @@ public class ExcelServiceImpl implements ExcelService {
             createHeaderRow(sheet, new String[]{"Project Id", "Project Name", "School Id", "School Name", "Student Id", "Student Name", "Topic Id", "Topic Name", "Before Intervention Mark", "After Intervention Mark"});
             int rowIndex = 1;
 
-            for (Student student : schoolProjectMapping.getStudents()) {
+            // Sort students by name in ascending order
+            List<Student> sortedStudents = schoolProjectMapping.getStudents().stream()
+                    .sorted((s1, s2) -> s1.getName().compareToIgnoreCase(s2.getName()))
+                    .toList();
+
+            for (Student student : sortedStudents) {
                 for (Topic topic : schoolProjectMapping.getProject().getTopics()) {
                     Row row = sheet.createRow(rowIndex++);
                     row.createCell(0).setCellValue(schoolProjectMapping.getProject().getId());
