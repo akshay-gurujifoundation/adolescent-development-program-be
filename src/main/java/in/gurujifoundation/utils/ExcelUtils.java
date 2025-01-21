@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class ExcelUtils {
 
@@ -52,7 +53,8 @@ public class ExcelUtils {
             if (cell.getCellType() == CellType.NUMERIC) {
                 return cell.getLocalDateTimeCellValue().toLocalDate();
             }
-            return LocalDate.parse(cell.getStringCellValue());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            return LocalDate.parse(cell.getStringCellValue(), formatter);
         } catch (Exception e) {
             return null;
         }
