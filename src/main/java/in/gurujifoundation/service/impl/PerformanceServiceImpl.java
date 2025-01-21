@@ -136,6 +136,7 @@ public class PerformanceServiceImpl implements PerformanceService {
         // Map each student to their response
         List<StudentPerformance> studentPerformances = groupedByStudent.entrySet().stream()
                 .map(entry -> mapToStudentPerformanceResponse(entry.getKey(), entry.getValue()))
+                .sorted(Comparator.comparing(StudentPerformance::getStudentName))
                 .toList();
         return StudentPerformanceResponse.builder().studentPerformances(studentPerformances).build();
     }
