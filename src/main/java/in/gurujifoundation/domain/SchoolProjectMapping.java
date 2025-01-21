@@ -2,6 +2,8 @@ package in.gurujifoundation.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.envers.Audited;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -15,6 +17,8 @@ import java.util.Set;
 @Builder
 @EqualsAndHashCode(callSuper = false, exclude = {"students"})
 @Table(name = "school_project_mapping")
+@Audited
+@EntityListeners(AuditingEntityListener.class)
 public class SchoolProjectMapping {
 
     @Id

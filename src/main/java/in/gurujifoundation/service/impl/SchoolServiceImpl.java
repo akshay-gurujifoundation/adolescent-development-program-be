@@ -116,10 +116,11 @@ public class SchoolServiceImpl implements SchoolService {
         try {
             log.debug("Started deleting school with id: {}", id);
             schoolRepository.deleteById(id);
+            
             log.debug("Successfully deleted school with id: {}", id);
             return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_DELETED_SUCCESSFULLY).build();
         } catch (Exception e) {
-            log.error("Error occurred while deleting teacher with id: {}", id, e);
+            log.error("Error occurred while deleting school with id: {}", id, e);
             throw new InternalServerException("Unexpected error occurred");
         }
     }

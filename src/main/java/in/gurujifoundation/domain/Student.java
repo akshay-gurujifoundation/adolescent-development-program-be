@@ -53,4 +53,8 @@ public class Student extends Auditable {
     @Column(name = "email")
     private String email;
 
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<Performance> performances = new HashSet<>();
+
 }

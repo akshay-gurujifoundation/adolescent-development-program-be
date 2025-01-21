@@ -59,4 +59,8 @@ public class School extends Auditable {
     @Builder.Default
     private List<Student> students = new ArrayList<>();
 
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<SchoolProjectMapping> schoolProjectMappings = new ArrayList<>();
+
 }
