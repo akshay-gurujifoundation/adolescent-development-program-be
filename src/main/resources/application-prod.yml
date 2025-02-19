@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://104.154.176.33:5432/adolescent_dev_program_dev
+    url: jdbc:postgresql://104.154.176.33:5432/adolescent_dev_program_prod
     username: adolescent_user
     password: Adolescent@123
 
