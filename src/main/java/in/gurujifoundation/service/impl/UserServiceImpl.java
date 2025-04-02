@@ -63,6 +63,8 @@ public class UserServiceImpl implements UserService {
         String jwtToken = jwtService.generateToken(extraClaims, user);
 
         return LoginResponse.builder()
+                .email(user.getEmail())
+                .name(user.getUsername())
                 .token(jwtToken)
                 .expiresIn(jwtService.getExpirationTime())
                 .role(user.getRole())
