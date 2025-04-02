@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: adp-backend
+    env: java
+    plan: free
+    buildCommand: ./mvnw clean package
+    startCommand: java -jar target/Adolescent-Development-Program-0.0.1.jar
+    healthCheckPath: /actuator/health
+    autoDeploy: true
