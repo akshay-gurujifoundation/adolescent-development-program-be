@@ -3,5 +3,7 @@ package in.gurujifoundation.domain;
 public enum UserRole {
     TEACHER,
     PROJECT_COORDINATOR,
-    STUDENT
+    STUDENT,
+    ADMIN,
+    SCHOOL_COORDINATOR
 }
