@@ -2,7 +2,7 @@ spring:
   application:
     name: Adolescent-Development-Program
   profiles:
-      active: prod
+      active: dev
   datasource:
     url: jdbc:postgresql://${db.host}:${db.port}/${db.name}
     username: ${db.username}
@@ -10,6 +10,8 @@ spring:
   jpa:
     properties:
       hibernate:
+        id:
+          db_structure_naming_strategy: legacy
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
