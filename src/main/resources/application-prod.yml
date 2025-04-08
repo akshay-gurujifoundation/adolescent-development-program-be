@@ -1,12 +1,6 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://10.1.0.3:5432/adolescent_dev_program_prod
-    username: adolescent_user
-    password: Adolescent@123
-
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: none
+db:
+  host: ep-wandering-waterfall-a8wes3po-pooler.eastus2.azure.neon.tech
+  port: 5432
+  name: adolescent_dev_program_prod
+  username: adolescent_dev_program_prod_owner
+  password: npg_PLq6KckJMy0T
