@@ -450,4 +450,38 @@ alter table student_project_aud
     owner to adolescent_user;
 
 
+drop table users;
+
+CREATE TABLE users
+(
+    id         BIGSERIAL PRIMARY KEY,
+    password   TEXT         NOT NULL,
+    username      VARCHAR(255) NOT NULL UNIQUE,
+    email      VARCHAR(255) NOT NULL UNIQUE,
+    role       VARCHAR(50)  NOT NULL,
+    created_by varchar(255) not null,
+    created_at timestamp    not null,
+    updated_by varchar(255) not null,
+    updated_at timestamp    not null
+
+);
+
+drop table users_aud;
+
+create table users_aud
+(
+    id         integer      not null,
+    rev        integer      not null
+        references revinfo,
+    revtype    smallint     not null,
+    password   TEXT         NOT NULL,
+    username      VARCHAR(255) NOT NULL UNIQUE,
+    email      VARCHAR(255) NOT NULL UNIQUE,
+    role       VARCHAR(50)  NOT NULL,
+    created_by varchar(255),
+    created_at timestamp,
+    updated_by varchar(255),
+    updated_at timestamp,
+    primary key (id, rev)
+);
 
