@@ -2,6 +2,7 @@ package in.gurujifoundation.exception.handler;
 
 
 import in.gurujifoundation.constants.ErrorCodeConstant;
+import in.gurujifoundation.exception.AuthenticationException;
 import in.gurujifoundation.exception.BadRequestException;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.ForbiddenException;
@@ -106,5 +107,12 @@ public class GlobalExceptionHandler {
         ResponseMessage responseMessage = ResponseMessage.builder().message(ex.getMessage()).build();
         APIResponse<Object> apiResponse = APIResponse.builder().status(Boolean.FALSE).messages(List.of(responseMessage)).build();
         return new ResponseEntity<>(apiResponse, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<APIResponse<Object>> handleAuthenticationException(AuthenticationException ex) {
+        ResponseMessage responseMessage = ResponseMessage.builder().message(ex.getMessage()).build();
+        APIResponse<Object> apiResponse = APIResponse.builder().status(Boolean.FALSE).messages(List.of(responseMessage)).build();
+        return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
     }
 }

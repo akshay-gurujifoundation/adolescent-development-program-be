@@ -44,4 +44,6 @@ public interface ErrorCodeConstant {
     String PROJECT_ID_CANNOT_BE_NULL = "Project id cannot be null";
     String TOPIC_IDS_CANNOT_BE_NULL_OR_EMPTY = "Topic ids cannot be null or empty";
     String PERFORMANCE_NOT_FOUND = "Performance not found";
+    String USER_CREATED_SUCCESSFULLY = "User created successfully";
+
 }

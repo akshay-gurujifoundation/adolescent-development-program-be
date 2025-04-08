@@ -211,21 +211,21 @@ create table student_aud
     primary key (id, rev)
 );
 
-CREATE TABLE project
+create table project
 (
-    id                SERIAL PRIMARY KEY,
-    name              VARCHAR(255) NOT NULL,
-    description       TEXT,
-    start_date        DATE,
-    end_date          DATE,
-    actual_start_date DATE,
-    actual_end_date   DATE,
-    status            VARCHAR(50),
-    created_by        VARCHAR(255) NOT NULL,
-    created_at        TIMESTAMP    NOT NULL,
-    updated_by        VARCHAR(255) NOT NULL,
-    updated_at        TIMESTAMP    NOT NULL,
-    CONSTRAINT fk_project_school_id FOREIGN KEY (school_id) REFERENCES school (id)
+    id                serial
+        primary key,
+    name              varchar(255) not null,
+    description       text,
+    start_date        date,
+    end_date          date,
+    actual_start_date date,
+    actual_end_date   date,
+    status            varchar(50),
+    created_by        varchar(255) not null,
+    created_at        timestamp    not null,
+    updated_by        varchar(255) not null,
+    updated_at        timestamp    not null
 );
 
 CREATE TABLE project_aud
@@ -247,6 +247,32 @@ CREATE TABLE project_aud
     PRIMARY KEY (id, rev)           -- Composite primary key
 );
 
+CREATE TABLE topic
+(
+    id          SERIAL PRIMARY KEY,
+    project_id  INT REFERENCES Project (id) NOT NULL,
+    topic_name  VARCHAR(255)                NOT NULL,
+    description VARCHAR(255),
+    created_by  VARCHAR(255)                NOT NULL,
+    created_at  TIMESTAMP                   NOT NULL,
+    updated_by  VARCHAR(255)                NOT NULL,
+    updated_at  TIMESTAMP                   NOT NULL
+);
+
+CREATE TABLE topic_aud
+(
+    id          SERIAL,
+    project_id  INT,
+    topic_name  VARCHAR(255),
+    description VARCHAR(255),
+    created_by  VARCHAR(255),
+    created_at  TIMESTAMP,
+    updated_by  VARCHAR(255),
+    updated_at  TIMESTAMP,
+    rev         INT,     -- Revision number
+    revtype     SMALLINT -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
+);
+
 
 CREATE TABLE performance
 (
@@ -265,7 +291,9 @@ CREATE TABLE performance
 
 -- Indexes to speed up queries on foreign key columns
 CREATE INDEX idx_performance_student_id ON performance (student_id);
-CREATE INDEX idx_performance_project_id ON performance (project_id);
+create index idx_performance_project_id
+    on performance (topic_id);
+
 
 
 CREATE TABLE performance_aud
@@ -303,35 +331,6 @@ CREATE TABLE student_project_aud
     revtype    SMALLINT -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
 );
 
-
-CREATE TABLE topic
-(
-    id          SERIAL PRIMARY KEY,
-    project_id  INT REFERENCES Project (id) NOT NULL,
-    topic_name  VARCHAR(255)                NOT NULL,
-    description VARCHAR(255),
-    created_by  VARCHAR(255)                NOT NULL,
-    created_at  TIMESTAMP                   NOT NULL,
-    updated_by  VARCHAR(255)                NOT NULL,
-    updated_at  TIMESTAMP                   NOT NULL
-);
-
-CREATE TABLE topic_aud
-(
-    id          SERIAL,
-    project_id  INT,
-    topic_name  VARCHAR(255),
-    description VARCHAR(255),
-    created_by  VARCHAR(255),
-    created_at  TIMESTAMP,
-    updated_by  VARCHAR(255),
-    updated_at  TIMESTAMP,
-    rev         INT,     -- Revision number
-    revtype     SMALLINT -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
-);
-
-
-
 CREATE TABLE project_coordinator
 (
     id                SERIAL PRIMARY KEY,
@@ -363,6 +362,55 @@ CREATE TABLE project_coordinator_aud
     revtype           SMALLINT -- Type of revision (0 = ADD, 1 = MODIFY, 2 = DELETE)
 );
 
+create table school_project_mapping
+(
+    id                serial
+        primary key,
+    project_id        integer not null
+        references project,
+    school_id         integer not null
+        references school,
+    teacher_id        integer not null
+        references teacher,
+    start_date        date,
+    end_date          date,
+    actual_start_date date,
+    actual_end_date   date
+);
+
+create table school_project_mapping_aud
+(
+    id                serial,
+    rev               integer,
+    revtype           smallint,
+    project_id        integer,
+    school_id         integer,
+    teacher_id        integer,
+    start_date        date,
+    end_date          date,
+    actual_start_date date,
+    actual_end_date   date
+);
+
+create table school_project_student_mapping
+(
+    school_project_id integer not null
+        references school_project_mapping,
+    student_id        integer not null
+        references student,
+    primary key (school_project_id, student_id)
+);
+
+
+create table school_project_student_mapping_aud
+(
+    school_project_id integer,
+    student_id        integer,
+    rev               integer,
+    revtype           smallint
+);
+
+
 
 CREATE TABLE project_project_coordinator
 (
@@ -392,3 +440,40 @@ ADD COLUMN end_date DATE,
 ADD COLUMN actual_start_date DATE,
 ADD COLUMN actual_end_date DATE;
 
+create table project_project_coordinator
+(
+    project_id     bigint not null
+        constraint fk_project
+            references project
+            on delete cascade,
+    coordinator_id bigint not null
+        constraint fk_project_coordinator
+            references project_coordinator
+            on delete cascade,
+    primary key (project_id, coordinator_id)
+);
+
+
+create table project_project_coordinator_aud
+(
+    rev            integer not null,
+    revtype        smallint,
+    project_id     bigint  not null,
+    coordinator_id bigint  not null,
+    primary key (rev, project_id, coordinator_id)
+);
+
+drop table school_project_mapping_aud;
+create table school_project_mapping_aud
+(
+    id                serial,
+    rev               integer,
+    revtype           smallint,
+    project_id        integer,
+    school_id         integer,
+    teacher_id        integer,
+    start_date        date,
+    end_date          date,
+    actual_start_date date,
+    actual_end_date   date
+);
