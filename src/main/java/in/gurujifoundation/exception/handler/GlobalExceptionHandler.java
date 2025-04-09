@@ -8,6 +8,7 @@ import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.ForbiddenException;
 import in.gurujifoundation.response.APIResponse;
 import in.gurujifoundation.response.ResponseMessage;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -130,10 +131,10 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(SignatureException.class)
-    public ResponseEntity<APIResponse<Object>> handleSignatureException(SignatureException ex) {
+    @ExceptionHandler({SignatureException.class, ExpiredJwtException.class})
+    public ResponseEntity<APIResponse<Object>> handleSignatureException(Exception ex) {
         log.error("JWT signature validation failed: {}", ex.getMessage());
-        ResponseMessage responseMessage = ResponseMessage.builder().message("Invalid authentication token").build();
+        ResponseMessage responseMessage = ResponseMessage.builder().message("Invalid authentication token : " + ex.getMessage() ).build();
         APIResponse<Object> apiResponse = APIResponse.builder().status(Boolean.FALSE).messages(List.of(responseMessage)).build();
         return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
     }
