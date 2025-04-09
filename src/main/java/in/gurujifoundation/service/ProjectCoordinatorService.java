@@ -6,12 +6,13 @@ import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.response.ProjectCoordinatorDetails;
 import in.gurujifoundation.response.ProjectCoordinatorResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 import java.util.Set;
 
 public interface ProjectCoordinatorService {
-    ResponseMessage createProjectCoordinator(CreateOrUpdateProjectCoordinatorRequest createOrUpdateProjectCoordinatorRequest);
+    ResponseMessage createProjectCoordinator(@Valid CreateOrUpdateProjectCoordinatorRequest createOrUpdateProjectCoordinatorRequest);
 
     ResponseMessage updateProjectCoordinator(CreateOrUpdateProjectCoordinatorRequest createOrUpdateProjectCoordinatorRequest, Long id);
 
@@ -19,7 +20,7 @@ public interface ProjectCoordinatorService {
 
     ProjectCoordinatorResponse getAllProjectCoordinators();
 
-    ResponseMessage deleteProjectCoordinator(Long id);
+    ResponseMessage deleteProjectCoordinator(@NotNull Long id);
 
     ProjectCoordinator getProjectCoordinator(Long id);
 

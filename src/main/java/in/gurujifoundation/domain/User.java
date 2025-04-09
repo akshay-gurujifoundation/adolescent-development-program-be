@@ -40,6 +40,9 @@ public class User extends Auditable implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = Boolean.TRUE;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

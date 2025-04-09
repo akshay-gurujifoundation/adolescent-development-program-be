@@ -4,8 +4,9 @@ import in.gurujifoundation.constants.ErrorCodeConstant;
 import in.gurujifoundation.domain.User;
 import in.gurujifoundation.dto.LoginResponse;
 import in.gurujifoundation.dto.LoginUserRequest;
-import in.gurujifoundation.dto.RegisterUserRequest;
+import in.gurujifoundation.dto.CreateUserRequest;
 import in.gurujifoundation.exception.AuthenticationException;
+import in.gurujifoundation.exception.DuplicateEmailException;
 import in.gurujifoundation.exception.UserNotFoundException;
 import in.gurujifoundation.repository.UserRepository;
 import in.gurujifoundation.response.ResponseMessage;
@@ -38,17 +39,36 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseMessage createUser(RegisterUserRequest input) {
+    public ResponseMessage createUser(CreateUserRequest createUserRequest) {
+        if (userRepository.existsByEmail(createUserRequest.getEmail())) {
+            throw new DuplicateEmailException("Email already exists: " + createUserRequest.getEmail());
+        }
         User user = User.builder()
-                .email(input.getEmail())
-                .username(input.getEmail())
-                .role(input.getUserRole())
-                .password(passwordEncoder.encode(input.getPassword()))
+                .email(createUserRequest.getEmail())
+                .username(createUserRequest.getEmail())
+                .role(createUserRequest.getUserRole())
+                .password(passwordEncoder.encode(createUserRequest.getPassword()))
                 .build();
 
         userRepository.save(user);
         return ResponseMessage.builder().message(ErrorCodeConstant.USER_CREATED_SUCCESSFULLY).build();
 
+    }
+
+    @Override
+    public User createAndReturnUser(CreateUserRequest createUserRequest) {
+        if (userRepository.existsByEmail(createUserRequest.getEmail())) {
+            throw new DuplicateEmailException("Email already exists: " + createUserRequest.getEmail());
+        }
+        User user = User.builder()
+                .email(createUserRequest.getEmail())
+                .username(createUserRequest.getEmail())
+                .role(createUserRequest.getUserRole())
+                .isActive(Boolean.TRUE)
+                .password(passwordEncoder.encode(createUserRequest.getPassword()))
+                .build();
+
+        return userRepository.save(user);
     }
 
     @Override

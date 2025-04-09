@@ -44,5 +44,8 @@ public class ProjectCoordinator extends Auditable {
     @ManyToMany(mappedBy = "projectCoordinators")
     private Set<Project> projects = new HashSet<>();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }
