@@ -1,9 +1,10 @@
 package in.gurujifoundation.request;
 
+import in.gurujifoundation.dto.CreateUserRequest;
 import lombok.Data;
 
 @Data
-public class CreateOrUpdateProjectCoordinatorRequest {
+public class CreateOrUpdateProjectCoordinatorRequest extends CreateUserRequest {
 
     private String name;
 

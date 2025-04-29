@@ -1,6 +1,7 @@
 package in.gurujifoundation.config;
 
 import in.gurujifoundation.service.impl.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -66,6 +67,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException expiredJwtException) {
+            // Explicitly handle expired JWT tokens to ensure 401 response
+            handlerExceptionResolver.resolveException(request, response, null, expiredJwtException);
         } catch (Exception exception) {
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }

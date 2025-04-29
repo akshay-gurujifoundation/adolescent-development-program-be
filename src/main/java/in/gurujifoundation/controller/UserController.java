@@ -2,7 +2,7 @@ package in.gurujifoundation.controller;
 
 import in.gurujifoundation.dto.LoginResponse;
 import in.gurujifoundation.dto.LoginUserRequest;
-import in.gurujifoundation.dto.RegisterUserRequest;
+import in.gurujifoundation.dto.CreateUserRequest;
 import in.gurujifoundation.response.APIResponse;
 import in.gurujifoundation.response.ResponseMessage;
 import in.gurujifoundation.service.UserService;
@@ -26,8 +26,8 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterUserRequest registerUserRequest) {
-        ResponseMessage responseMessage = userService.createUser(registerUserRequest);
+    public ResponseEntity<?> register(@RequestBody CreateUserRequest createUserRequest) {
+        ResponseMessage responseMessage = userService.createUser(createUserRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(APIResponse.builder()
                         .status(Boolean.TRUE)

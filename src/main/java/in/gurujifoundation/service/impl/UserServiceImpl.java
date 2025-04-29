@@ -2,10 +2,11 @@ package in.gurujifoundation.service.impl;
 
 import in.gurujifoundation.constants.ErrorCodeConstant;
 import in.gurujifoundation.domain.User;
+import in.gurujifoundation.dto.CreateUserRequest;
 import in.gurujifoundation.dto.LoginResponse;
 import in.gurujifoundation.dto.LoginUserRequest;
-import in.gurujifoundation.dto.RegisterUserRequest;
 import in.gurujifoundation.exception.AuthenticationException;
+import in.gurujifoundation.exception.DuplicateEmailException;
 import in.gurujifoundation.exception.UserNotFoundException;
 import in.gurujifoundation.repository.UserRepository;
 import in.gurujifoundation.response.ResponseMessage;
@@ -30,7 +31,8 @@ public class UserServiceImpl implements UserService {
 
     private final JwtService jwtService;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                           AuthenticationManager authenticationManager, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -38,13 +40,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseMessage createUser(RegisterUserRequest input) {
+    public ResponseMessage createUser(CreateUserRequest createUserRequest) {
+        if (userRepository.existsByEmail(createUserRequest.getEmail())) {
+            throw new DuplicateEmailException("Email already exists: " + createUserRequest.getEmail());
+        }
         User user = User.builder()
-                .email(input.getEmail())
-                .username(input.getEmail())
-                .role(input.getUserRole())
-                .password(passwordEncoder.encode(input.getPassword()))
-                .build();
+            .email(createUserRequest.getEmail())
+            .username(createUserRequest.getEmail())
+            .role(createUserRequest.getUserRole())
+            .isActive(Boolean.TRUE)
+            .password(passwordEncoder.encode(createUserRequest.getPassword()))
+            .build();
 
         userRepository.save(user);
         return ResponseMessage.builder().message(ErrorCodeConstant.USER_CREATED_SUCCESSFULLY).build();
@@ -52,10 +58,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User createAndReturnUser(CreateUserRequest createUserRequest) {
+        if (userRepository.existsByEmail(createUserRequest.getEmail())) {
+            throw new DuplicateEmailException("Email already exists: " + createUserRequest.getEmail());
+        }
+        User user = User.builder()
+            .email(createUserRequest.getEmail())
+            .username(createUserRequest.getEmail())
+            .role(createUserRequest.getUserRole())
+            .isActive(Boolean.TRUE)
+            .password(passwordEncoder.encode(createUserRequest.getPassword()))
+            .build();
+
+        return userRepository.save(user);
+    }
+
+    @Override
     public LoginResponse authenticateUser(LoginUserRequest input) {
         try {
             authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword()));
             Optional<User> userOpt = userRepository.findByEmail(input.getEmail());
             if (userOpt.isEmpty()) {
                 throw new UserNotFoundException("User not found for given email : " + input.getEmail());
@@ -66,12 +88,12 @@ public class UserServiceImpl implements UserService {
             String jwtToken = jwtService.generateToken(extraClaims, user);
 
             return LoginResponse.builder()
-                    .email(user.getEmail())
-                    .name(user.getUsername())
-                    .token(jwtToken)
-                    .expiresIn(jwtService.getExpirationTime())
-                    .role(user.getRole())
-                    .build();
+                .email(user.getEmail())
+                .name(user.getUsername())
+                .token(jwtToken)
+                .expiresIn(jwtService.getExpirationTime())
+                .role(user.getRole())
+                .build();
         } catch (BadCredentialsException ex) {
             throw new AuthenticationException("Invalid username or password");
         } catch (Exception ex) {

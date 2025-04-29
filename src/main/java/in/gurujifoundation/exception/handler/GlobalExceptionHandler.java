@@ -8,6 +8,7 @@ import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.ForbiddenException;
 import in.gurujifoundation.response.APIResponse;
 import in.gurujifoundation.response.ResponseMessage;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import in.gurujifoundation.exception.TokenExpiredException;
+import io.jsonwebtoken.security.SignatureException;
 
 @RestControllerAdvice
 @Slf4j
@@ -40,7 +43,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<APIResponse<Object>> handleInternalServerException(Exception ex) {
         log.error(ex.getMessage(), ex.getCause());
-        ResponseMessage responseMessage = ResponseMessage.builder().message("Unexpected error occurred").build();
+        ResponseMessage responseMessage = ResponseMessage.builder().message("Unexpected error occurred : " + ex.getMessage()).build();
         APIResponse<Object> apiResponse = APIResponse.builder().status(Boolean.FALSE).messages(List.of(responseMessage)).build();
         return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -109,9 +112,29 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiResponse, HttpStatus.FORBIDDEN);
     }
 
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<APIResponse<Object>> handleAuthenticationException(AuthenticationException ex) {
+        log.error("Authentication failed: {}", ex.getMessage());
         ResponseMessage responseMessage = ResponseMessage.builder().message(ex.getMessage()).build();
+        APIResponse<Object> apiResponse = APIResponse.builder().status(Boolean.FALSE).messages(List.of(responseMessage)).build();
+        return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<APIResponse<Object>> handleTokenExpiredException(TokenExpiredException ex) {
+        log.error("Token expired: {}", ex.getMessage());
+        ResponseMessage responseMessage = ResponseMessage.builder().message(ex.getMessage()).build();
+        APIResponse<Object> apiResponse = APIResponse.builder().status(Boolean.FALSE).messages(List.of(responseMessage)).build();
+        return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler({SignatureException.class, ExpiredJwtException.class})
+    public ResponseEntity<APIResponse<Object>> handleSignatureException(Exception ex) {
+        log.error("JWT signature validation failed: {}", ex.getMessage());
+        ResponseMessage responseMessage = ResponseMessage.builder().message("Invalid authentication token : " + ex.getMessage() ).build();
         APIResponse<Object> apiResponse = APIResponse.builder().status(Boolean.FALSE).messages(List.of(responseMessage)).build();
         return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
     }
