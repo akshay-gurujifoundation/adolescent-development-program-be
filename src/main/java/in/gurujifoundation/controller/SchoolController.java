@@ -201,15 +201,23 @@ public class SchoolController {
 
         BulkUploadResponse response = schoolService.uploadSchoolExcel(file);
 
-        // Set status to false if there were any validation errors
         boolean status = response.getStats().getFailureCount() == 0;
 
-        // Return a 200 OK response with detailed validation results
-        return ResponseEntity.ok(APIResponse.builder()
-                .status(status)
+        if (status) {
+            return ResponseEntity.ok(APIResponse.builder()
+                .status(true)
                 .messages(response.getMessages())
                 .data(response.getStats())
                 .build());
+        } else {
+            return ResponseEntity
+                .badRequest()
+                .body(APIResponse.builder()
+                    .status(false)
+                    .messages(response.getMessages())
+                    .data(response.getStats())
+                    .build());
+        }
     }
 
     @Operation(
