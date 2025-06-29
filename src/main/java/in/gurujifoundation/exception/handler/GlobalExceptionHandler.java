@@ -6,6 +6,9 @@ import in.gurujifoundation.exception.AuthenticationException;
 import in.gurujifoundation.exception.BadRequestException;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.ForbiddenException;
+import in.gurujifoundation.exception.InternalServerException;
+import in.gurujifoundation.exception.ProjectCoordinatorCreationException;
+import in.gurujifoundation.exception.ProjectCoordinatorDeletionException;
 import in.gurujifoundation.response.APIResponse;
 import in.gurujifoundation.response.ResponseMessage;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -41,7 +44,7 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<APIResponse<Object>> handleInternalServerException(Exception ex) {
+    public ResponseEntity<APIResponse<Object>> handleGenericException(Exception ex) {
         log.error(ex.getMessage(), ex.getCause());
         ResponseMessage responseMessage = ResponseMessage.builder().message("Unexpected error occurred : " + ex.getMessage()).build();
         APIResponse<Object> apiResponse = APIResponse.builder().status(Boolean.FALSE).messages(List.of(responseMessage)).build();
@@ -137,5 +140,44 @@ public class GlobalExceptionHandler {
         ResponseMessage responseMessage = ResponseMessage.builder().message("Invalid authentication token : " + ex.getMessage() ).build();
         APIResponse<Object> apiResponse = APIResponse.builder().status(Boolean.FALSE).messages(List.of(responseMessage)).build();
         return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(ProjectCoordinatorCreationException.class)
+    public ResponseEntity<APIResponse<Object>> handleProjectCoordinatorCreationException(ProjectCoordinatorCreationException ex) {
+        log.error("Failed to create project coordinator: {}", ex.getMessage(), ex);
+        String errorMessage = ex.getMessage();
+        if (ex.getCause() != null) {
+            errorMessage += " - Cause: " + ex.getCause().getMessage();
+        }
+        ResponseMessage responseMessage = ResponseMessage.builder().message(errorMessage).build();
+        APIResponse<Object> apiResponse = APIResponse.builder().status(Boolean.FALSE).messages(List.of(responseMessage)).build();
+        return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(ProjectCoordinatorDeletionException.class)
+    public ResponseEntity<APIResponse<Object>> handleProjectCoordinatorDeletionException(ProjectCoordinatorDeletionException ex) {
+        log.error("Failed to delete project coordinator: {}", ex.getMessage(), ex);
+        String errorMessage = ex.getMessage();
+        if (ex.getCause() != null) {
+            errorMessage += " - Cause: " + ex.getCause().getMessage();
+        }
+        ResponseMessage responseMessage = ResponseMessage.builder().message(errorMessage).build();
+        APIResponse<Object> apiResponse = APIResponse.builder().status(Boolean.FALSE).messages(List.of(responseMessage)).build();
+        return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(InternalServerException.class)
+    public ResponseEntity<APIResponse<Object>> handleInternalServerException(InternalServerException ex) {
+        log.error("Internal server error: {}", ex.getMessage(), ex);
+        String errorMessage = ex.getMessage();
+        if (ex.getCause() != null) {
+            errorMessage += " - Cause: " + ex.getCause().getMessage();
+        }
+        ResponseMessage responseMessage = ResponseMessage.builder().message(errorMessage).build();
+        APIResponse<Object> apiResponse = APIResponse.builder().status(Boolean.FALSE).messages(List.of(responseMessage)).build();
+        return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
