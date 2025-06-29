@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -78,6 +79,8 @@ public class JwtService {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            throw e; // Re-throw to be handled by GlobalExceptionHandler
+        } catch (SignatureException e) {
             throw e; // Re-throw to be handled by GlobalExceptionHandler
         }
     }

@@ -180,9 +180,9 @@ public class SchoolController {
     }
 
     @Operation(summary = "Upload schools via Excel file",
-            description = "Upload multiple schools using Excel file format")
+            description = "Upload multiple schools using Excel file format with detailed validation. If any row has validation errors, no schools will be saved.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Schools uploaded successfully"),
+            @ApiResponse(responseCode = "200", description = "Schools processed - check response for validation details. Schools are only saved if all rows are valid."),
             @ApiResponse(responseCode = "400", description = "Invalid input or file format"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
@@ -201,8 +201,12 @@ public class SchoolController {
 
         BulkUploadResponse response = schoolService.uploadSchoolExcel(file);
 
+        // Set status to false if there were any validation errors
+        boolean status = response.getStats().getFailureCount() == 0;
+
+        // Return a 200 OK response with detailed validation results
         return ResponseEntity.ok(APIResponse.builder()
-                .status(true)
+                .status(status)
                 .messages(response.getMessages())
                 .data(response.getStats())
                 .build());

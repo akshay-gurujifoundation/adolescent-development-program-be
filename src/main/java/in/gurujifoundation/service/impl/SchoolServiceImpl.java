@@ -3,6 +3,8 @@ package in.gurujifoundation.service.impl;
 import in.gurujifoundation.constants.ErrorCodeConstant;
 import in.gurujifoundation.domain.School;
 import in.gurujifoundation.dto.BulkUploadResponse;
+import in.gurujifoundation.dto.ExcelValidationResult;
+import in.gurujifoundation.dto.RowValidationResult;
 import in.gurujifoundation.dto.UploadStats;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
@@ -116,7 +118,7 @@ public class SchoolServiceImpl implements SchoolService {
         try {
             log.debug("Started deleting school with id: {}", id);
             schoolRepository.deleteById(id);
-            
+
             log.debug("Successfully deleted school with id: {}", id);
             return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_DELETED_SUCCESSFULLY).build();
         } catch (Exception e) {
@@ -204,16 +206,14 @@ public class SchoolServiceImpl implements SchoolService {
     public BulkUploadResponse uploadSchoolExcel(MultipartFile file) {
         log.info("Processing school upload.");
 
-        List<ResponseMessage> messages = new ArrayList<>();
-        UploadStats stats = new UploadStats();
-        List<String> failedSchools = new ArrayList<>();
+        ExcelValidationResult validationResult = new ExcelValidationResult();
+        List<School> validSchools = new ArrayList<>();
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
 
             // Skip header row
             int rowNum = 1;
-            List<School> validSchools = new ArrayList<>();
 
             while (rowNum <= sheet.getLastRowNum()) {
                 Row row = sheet.getRow(rowNum);
@@ -224,34 +224,40 @@ public class SchoolServiceImpl implements SchoolService {
 
                 try {
                     CreateOrUpdateSchoolRequest createOrUpdateSchoolRequest = extractSchoolFromRow(row);
-                    String schoolName = createOrUpdateSchoolRequest.getName();
 
-                    if (SchoolValidator.validateSchool(createOrUpdateSchoolRequest, messages, rowNum)) {
+                    // Validate the school with detailed validation
+                    RowValidationResult rowResult = SchoolValidator.validateSchoolDetailed(createOrUpdateSchoolRequest, rowNum);
+
+                    // Add the validation result to the overall results
+                    validationResult.addRowResult(rowResult);
+
+                    // If valid, add to the list of schools to save
+                    if (!rowResult.hasErrors()) {
                         School school = SchoolMapper.INSTANCE.mapToEntity(createOrUpdateSchoolRequest);
                         validSchools.add(school);
-                        stats.incrementSuccessCount();
-                    } else {
-                        stats.incrementFailureCount();
-                        if (schoolName != null && !schoolName.trim().isEmpty()) {
-                            failedSchools.add(schoolName);
-                        } else {
-                            failedSchools.add("Row " + rowNum + " (No Name)");
-                        }
                     }
                 } catch (Exception e) {
                     log.error("Error processing row {}: {}", rowNum, e.getMessage());
-                    messages.add(new ResponseMessage("Error in row " + rowNum + ": " + e.getMessage()));
-                    stats.incrementFailureCount();
-                    String schoolName = ExcelUtils.getCellValueAsString(row.getCell(0));
-                    failedSchools.add(schoolName != null ? schoolName : "Row " + rowNum + " (No Name)");
+
+                    // Create a validation result for the exception
+                    RowValidationResult errorResult = RowValidationResult.builder()
+                            .rowNumber(rowNum)
+                            .schoolName(row != null ? ExcelUtils.getCellValueAsString(row.getCell(0)) : null)
+                            .build();
+                    errorResult.addError("Processing Error", e.getMessage());
+
+                    // Add the error result to the overall results
+                    validationResult.addRowResult(errorResult);
                 }
                 rowNum++;
             }
 
-            // Batch save schools
-            if (!validSchools.isEmpty()) {
+            // Only save schools if there are no validation errors in any row
+            if (!validSchools.isEmpty() && validationResult.getStats().getFailureCount() == 0) {
                 schoolRepository.saveAll(validSchools);
                 log.info("Successfully saved {} schools.", validSchools.size());
+            } else if (validationResult.getStats().getFailureCount() > 0) {
+                log.info("Not saving any schools because there are validation errors in the file.");
             }
 
         } catch (IOException e) {
@@ -259,8 +265,8 @@ public class SchoolServiceImpl implements SchoolService {
             throw new InternalServerException("Failed to process Excel file: " + e.getMessage());
         }
 
-        stats.setFailedItems(failedSchools);
-        return new BulkUploadResponse(messages, stats);
+        // Convert the validation results to a BulkUploadResponse
+        return validationResult.toBulkUploadResponse();
     }
 
     @Override
