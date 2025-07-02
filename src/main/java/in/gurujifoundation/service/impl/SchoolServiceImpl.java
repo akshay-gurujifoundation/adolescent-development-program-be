@@ -6,6 +6,7 @@ import in.gurujifoundation.dto.BulkUploadResponse;
 import in.gurujifoundation.dto.ExcelValidationResult;
 import in.gurujifoundation.dto.RowValidationResult;
 import in.gurujifoundation.dto.UploadStats;
+import in.gurujifoundation.exception.BadRequestException;
 import in.gurujifoundation.exception.EntityNotFoundException;
 import in.gurujifoundation.exception.InternalServerException;
 import in.gurujifoundation.mapper.SchoolMapper;
@@ -31,8 +32,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -49,10 +52,21 @@ public class SchoolServiceImpl implements SchoolService {
     public ResponseMessage createSchool(CreateOrUpdateSchoolRequest createSchoolRequest) {
         try {
             log.debug("Started creating school with name: {}", createSchoolRequest.getName());
+
+            // Check if school with the same name already exists
+            Optional<School> existingSchool = schoolRepository.findByNameIgnoreCase(createSchoolRequest.getName());
+            if (existingSchool.isPresent()) {
+                log.warn("School with name '{}' already exists", createSchoolRequest.getName());
+                throw new BadRequestException(ErrorCodeConstant.SCHOOL_NAME_ALREADY_EXISTS);
+            }
+
             School school = SchoolMapper.INSTANCE.mapToEntity(createSchoolRequest);
             schoolRepository.save(school);
             log.debug("Successfully created school with name: {}", createSchoolRequest.getName());
             return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_CREATED_SUCCESSFULLY).build();
+        } catch (BadRequestException e) {
+            // Re-throw BadRequestException to be handled by the global exception handler
+            throw e;
         } catch (Exception e) {
             log.error("Error occurred while saving school with name: {}", createSchoolRequest.getName(), e);
             throw new InternalServerException("Unexpected error occurred");
@@ -92,10 +106,23 @@ public class SchoolServiceImpl implements SchoolService {
         try {
             log.debug("Started updating school with id: {}", id);
             School school = getSchool(id);
+
+            // Check if the name is being changed and if a school with the new name already exists
+            if (!school.getName().equalsIgnoreCase(updateSchoolRequest.getName())) {
+                Optional<School> existingSchool = schoolRepository.findByNameIgnoreCase(updateSchoolRequest.getName());
+                if (existingSchool.isPresent() && !existingSchool.get().getId().equals(id)) {
+                    log.warn("School with name '{}' already exists", updateSchoolRequest.getName());
+                    throw new BadRequestException(ErrorCodeConstant.SCHOOL_NAME_ALREADY_EXISTS);
+                }
+            }
+
             SchoolMapper.INSTANCE.updateSchool(updateSchoolRequest, school);
             schoolRepository.save(school);
             log.debug("Successfully updated school with id: {}", id);
             return ResponseMessage.builder().message(ErrorCodeConstant.SCHOOL_UPDATED_SUCCESSFULLY).build();
+        } catch (BadRequestException e) {
+            // Re-throw BadRequestException to be handled by the global exception handler
+            throw e;
         } catch (Exception e) {
             log.error("Error occurred while updating school with email: {}", updateSchoolRequest.getName(), e);
             throw new InternalServerException("Unexpected error occurred");
@@ -208,6 +235,8 @@ public class SchoolServiceImpl implements SchoolService {
 
         ExcelValidationResult validationResult = new ExcelValidationResult();
         List<School> validSchools = new ArrayList<>();
+        // Set to track school names in the Excel file to check for duplicates
+        Set<String> schoolNamesInFile = new HashSet<>();
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
@@ -231,10 +260,28 @@ public class SchoolServiceImpl implements SchoolService {
                     // Add the validation result to the overall results
                     validationResult.addRowResult(rowResult);
 
-                    // If valid, add to the list of schools to save
+                    // If valid, check for uniqueness and add to the list of schools to save
                     if (!rowResult.hasErrors()) {
-                        School school = SchoolMapper.INSTANCE.mapToEntity(createOrUpdateSchoolRequest);
-                        validSchools.add(school);
+                        String schoolName = createOrUpdateSchoolRequest.getName().toLowerCase();
+
+                        // Check if school with the same name already exists in the database
+                        Optional<School> existingSchool = schoolRepository.findByNameIgnoreCase(schoolName);
+
+                        // Check if school with the same name already exists in the current file
+                        boolean duplicateInFile = !schoolNamesInFile.add(schoolName);
+
+                        if (existingSchool.isPresent()) {
+                            // Add a validation error for duplicate school name in database
+                            rowResult.addError("Name", ErrorCodeConstant.SCHOOL_NAME_ALREADY_EXISTS + " in database");
+                            validationResult.addRowResult(rowResult);
+                        } else if (duplicateInFile) {
+                            // Add a validation error for duplicate school name in the current file
+                            rowResult.addError("Name", ErrorCodeConstant.SCHOOL_NAME_ALREADY_EXISTS + " in current file");
+                            validationResult.addRowResult(rowResult);
+                        } else {
+                            School school = SchoolMapper.INSTANCE.mapToEntity(createOrUpdateSchoolRequest);
+                            validSchools.add(school);
+                        }
                     }
                 } catch (Exception e) {
                     log.error("Error processing row {}: {}", rowNum, e.getMessage());
